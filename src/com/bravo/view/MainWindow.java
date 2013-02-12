@@ -31,13 +31,6 @@ public final class MainWindow extends FrameView {
     private EventController eventController;
     private User user;
     private MainWindow mw;
-    
-    //Security points: Escape strings and Password Encryption
-    //Usability - Need to develop/find a JDBC HTTP Proxy solution
-    //Design - Need to find a new way of creating tables so that:
-    	//Events over multiple slots have a colspan attribute (GridBagLayout)
-    	//Event cells have a randomised colour to make them stand out
-    	//Clicking on a table cell should create the appropriate event dialog
 	
     public MainWindow(SingleFrameApplication app) {
         super(app);
