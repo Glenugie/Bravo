@@ -1,5 +1,6 @@
 package com.bravo.utils;
 
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -15,6 +16,24 @@ public class Utils {
 		if (timeArray[1].length() == 1) { timeArray[1] = "0"+timeArray[1];}
 		
 		return timeArray[0]+":"+timeArray[1];
+	}
+	
+	public static String passEncrypt(char[] password) {
+		String passwordConverted = new String(password);
+		byte[] pass = null;
+		MessageDigest md = null;
+		try {
+			pass =  passwordConverted.getBytes("UTF-8");
+			md = MessageDigest.getInstance("SHA1");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		byte[] newPass = md.digest(pass);
+		String encrypt = "";
+		for (int i=0; i < newPass.length; i++) {
+			encrypt += Integer.toString( ( newPass[i] & 0xff ) + 0x100, 16).substring( 1 );
+		}
+		return encrypt;
 	}
 	
 	public static Date parseDate(String d) {

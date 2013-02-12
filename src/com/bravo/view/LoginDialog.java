@@ -64,12 +64,13 @@ public class LoginDialog extends javax.swing.JDialog {
     		try {
     			if (!username.getText().equals("") && !password.equals("")) {
 	    			ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='"+username.getText()+"'");
+	    			String encryptedPass = Utils.passEncrypt(password.getPassword());
 	    			if (userArray.size() <= 0) {
 	    				Utils.error("We couldn't find a user matching that username in our database");
-	    			} else if (!userArray.get(0).get("password").equals(String.valueOf(password.getPassword()))) {
+	    			} else if (!userArray.get(0).get("password").equals(encryptedPass)) {
 	    				Utils.error("Incorrect password");
 	    			} else {
-	    				mainWindow.setUser((Long) userArray.get(0).get("userId"));
+	    				mainWindow.setUser(new Integer((int) userArray.get(0).get("userId")).longValue());
 	    				dispose();
 	    			}
     			} else {

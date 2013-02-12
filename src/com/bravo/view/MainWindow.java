@@ -43,7 +43,7 @@ public final class MainWindow extends FrameView {
         
         eventController = new EventController();
         mw = this;
-        user = new User(1);
+        user = new User(-4);
 
         initComponents();
         initMyComponents();
@@ -138,16 +138,18 @@ public final class MainWindow extends FrameView {
     
     public void clearOldEvents() {
     	//Delete all events from < Yesterday
-    	ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"'");
-    	for (int i = userEvents.size()-1; i >= 0; i -= 1) {
-    		try {
-	    		if (Utils.parseDate((String) userEvents.get(i).get("date")).getTime() < new Date().getTime()-86400000) {
-	    			Mysql.query("DELETE FROM timetable WHERE eventId='"+userEvents.get(i).get("eventId")+"'");
-	    			userEvents.remove(i);
+    	if (user.getId() != -4) {
+	    	ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"'");
+	    	for (int i = userEvents.size()-1; i >= 0; i -= 1) {
+	    		try {
+		    		if (Utils.parseDate((String) userEvents.get(i).get("date")).getTime() < new Date().getTime()-86400000) {
+		    			Mysql.query("DELETE FROM timetable WHERE eventId='"+userEvents.get(i).get("eventId")+"'");
+		    			userEvents.remove(i);
+		    		}
+	    		} catch (Exception e) {
+	    			System.err.println("There was a problem clearing up old events");
 	    		}
-    		} catch (Exception e) {
-    			System.err.println("There was a problem clearing up old events");
-    		}
+	    	}
     	}
     }
 
