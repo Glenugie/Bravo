@@ -24,7 +24,7 @@ public class Utils {
 		MessageDigest md = null;
 		try {
 			pass =  passwordConverted.getBytes("UTF-8");
-			md = MessageDigest.getInstance("SHA1");
+			md = MessageDigest.getInstance("SHA-512");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
