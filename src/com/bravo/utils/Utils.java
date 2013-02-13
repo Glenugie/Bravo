@@ -19,20 +19,18 @@ public class Utils {
 	}
 	
 	public static String passEncrypt(char[] password) {
-		String passwordConverted = new String(password);
 		byte[] pass = null;
 		MessageDigest md = null;
 		try {
-			pass =  passwordConverted.getBytes("UTF-8");
+			pass =  new String(password).getBytes("UTF-8");
 			md = MessageDigest.getInstance("SHA-512");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		byte[] newPass = md.digest(pass);
 		String encrypt = "";
-		for (int i=0; i < newPass.length; i++) {
-			encrypt += Integer.toString( ( newPass[i] & 0xff ) + 0x100, 16).substring( 1 );
-		}
+		for (int i=0; i < newPass.length; i++) { encrypt += Integer.toString((newPass[i]&0xff)+0x100,16).substring(1);}
+		
 		return encrypt;
 	}
 	
