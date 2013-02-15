@@ -83,7 +83,7 @@ public class EventDialog extends javax.swing.JDialog {
         if (eId == -1) {
         	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
         } else {
-        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"', eventId='"+eId+"'");
+        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"' AND eventId='"+eId+"'");
         }
         String buttonText = "";
         if (currentEvents.size() > 0) { 

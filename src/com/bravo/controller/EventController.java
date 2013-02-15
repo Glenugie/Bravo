@@ -37,15 +37,15 @@ public class EventController {
 			boolean chainClash = false;
 			for (int i = 0; i < eventUsers.size(); i += 1) {
 				long timeCounter = e.date.getTime();
-				for (int j = 0; j < chainLength; j += 1) {
+				//for (int j = 0; j < chainLength; j += 1) {
 					String eventParsedDate = dateFormat.format(timeCounter);
 					timeCounter += (86400000*7);
 					if (!slotFree(e.eventId,e.start,e.end,eventParsedDate,eventUsers.get(i))) {
 						clashFree = false;
 						if (eventUsers.get(i) != user.getId()) { otherUser = true;}
-						if (chainLength > 1) { chainClash = true;}
+						//if (chainLength > 1) { chainClash = true;}
 					}
-				}
+				//}
 			}
 			
 			if (clashFree || (!clashFree && !otherUser && !chainClash && Utils.question("This event clashes with a pre-existing event, would you like to overwrite?")) || (!clashFree && !otherUser && chainClash && Utils.question("This event chain clashes with a pre-existing event, would you like to overwrite? (You will not be able to reschedule the overwritten event)"))) {
@@ -73,14 +73,14 @@ public class EventController {
 					//}
 				}
 				if (!clashFree && !chainClash && Utils.question("Do you want to reschedule the overwritten event?")) {
-					/*HashMap<String,Object> overwrittenEvent = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"' AND name='"+e.name+"' AND type='"+e.type+"' AND start='"+e.start+"' AND end='"+e.end+"', date='"+e.date+"', location='"+e.location+"', priority='"+e.priority+"'").get(0);
-					EventDialog eventDialog = new EventDialog(mainWindow, this, App.getApplication().getMainFrame(), true, user.getId(), (String)overwrittenEvent.get("start"), (String)overwrittenEvent.get("date"), (int)overwrittenEvent.get("eventId"));
-					eventDialog.pack();
-					eventDialog.setLocationRelativeTo(null);
-					eventDialog.setSize(new Dimension(400, 400));
-					eventDialog.setVisible(true);*/
-					Utils.error("Currently unable to reschedule events");
-					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM timetable WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
+					for (int i = 0; i < overwrittenEvents.size(); i += 1) { 
+						HashMap<String,Object> overwrittenEvent = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"' AND eventId='"+overwrittenEvents.get(i)+"'").get(0);
+						EventDialog eventDialog = new EventDialog(mainWindow, this, App.getApplication().getMainFrame(), true, user.getId(), ""+Utils.timeToMin((String)overwrittenEvent.get("start")), (String)overwrittenEvent.get("date"), (int)overwrittenEvent.get("eventId"));
+						eventDialog.pack();
+						eventDialog.setLocationRelativeTo(null);
+						eventDialog.setSize(new Dimension(400, 400));
+						eventDialog.setVisible(true);
+					}
 				} else if (!clashFree) {
 					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM timetable WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
 				}
@@ -100,11 +100,16 @@ public class EventController {
 		boolean free = true;
 		for (int i = 0; i < timeSlots; i += 1) {
 			String time = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*i));
-			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start='"+time+"' AND date='"+date+"'");
-			if (eventInSlot != null && (Integer) eventInSlot != eventId) {
+			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND date='"+date+"' AND eventId!='"+eventId+"' AND (start='"+time+"' OR end='"+time+"')");
+			if (eventInSlot != null) {
 				if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
 				free= false;
 			}
+		}
+		Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>='"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
+		if (eventInSlot != null) {
+			if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
+			free= false;
 		}
 		return free;
 	}
