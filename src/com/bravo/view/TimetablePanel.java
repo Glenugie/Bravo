@@ -30,7 +30,6 @@ public class TimetablePanel extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 6681191891565986348L;
-	private final int timeSlot = 15; // In minutes
 	private JPanel timetable;
 	private GridBagConstraints c;
 	private MainWindow mainWindow;
@@ -59,9 +58,9 @@ public class TimetablePanel extends javax.swing.JPanel {
 			c.fill = GridBagConstraints.HORIZONTAL;
 
 			addCell("Date", 0, 0);
-			for (int i = 0; i < 1440; i += timeSlot) {
+			for (int i = 0; i < 1440; i += eventController.timeSlot) {
 				String time = Utils.minToTime(i);
-				addCell(time, (i / timeSlot) + 1, 0);
+				addCell(time, (i / eventController.timeSlot) + 1, 0);
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 			String date = dateFormat.format(new Date().getTime());
@@ -83,19 +82,19 @@ public class TimetablePanel extends javax.swing.JPanel {
 					Integer endSlot = (((Integer.parseInt(endTime.substring(0,
 							2)) * 60) + Integer.parseInt(endTime
 							.substring(3, 5))) / 15) + 1;
-					events.put((startSlot * timeSlot) - (1 * timeSlot), endSlot
+					events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot
 							- startSlot);
 				}
 
 				int row = 0;
-				for (int i = 0; i < 1440; i += timeSlot) {
+				for (int i = 0; i < 1440; i += eventController.timeSlot) {
 					if (events.get(i) != null) {
 						addCell((String) timetableDay.get(row).get("name"),
-								((i / timeSlot) + 1), (day + 1), events.get(i),
+								((i / eventController.timeSlot) + 1), (day + 1), events.get(i),
 								date);
 						row += 1;
 					} else {
-						addCell("+", ((i / timeSlot) + 1), (day + 1), 1, date);
+						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date);
 					}
 				}
 
@@ -115,8 +114,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 			JButton source = (JButton) actionEvent.getSource();
 			String[] name = source.getName().split(",");
 			JFrame mainFrame = App.getApplication().getMainFrame();
-			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame,
-					true, user.getId(), name[0], name[1], timeSlot);
+			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), name[0], name[1],-1);
 			eventDialog.pack();
 			eventDialog.setLocationRelativeTo(null);
 			eventDialog.setSize(new Dimension(400, 400));
@@ -143,7 +141,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.ipady = 100;
 		JButton b = new JButton(s);
 		b.setBorder(LineBorder.createBlackLineBorder());
-		b.setName(((x * timeSlot) - (1 * timeSlot)) + "," + date);
+		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date);
 		b.addActionListener(eventButtonAL);
 		timetable.add(b, c);
 	}

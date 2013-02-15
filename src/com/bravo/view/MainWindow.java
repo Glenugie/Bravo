@@ -41,7 +41,7 @@ public final class MainWindow extends FrameView {
 			System.exit(0);
         }
         
-        eventController = new EventController();
+        eventController = new EventController(this);
         mw = this;
         user = new User(-4);
 
@@ -166,6 +166,7 @@ public final class MainWindow extends FrameView {
     
     public void setUser(long userId) {
     	this.user = new User(userId);
+    	eventController.user = new User(userId);
     	update();
     }
     

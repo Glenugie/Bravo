@@ -66,6 +66,10 @@ public class Mysql {
 	}
 	
 	public static Object queryTerm(String term, String table, String where) {
-		return query("SELECT "+term+" FROM "+table+" "+where).get(0).get(term);
+		try {
+			return query("SELECT "+term+" FROM "+table+" "+where).get(0).get(term);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

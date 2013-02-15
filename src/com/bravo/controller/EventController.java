@@ -1,73 +1,105 @@
 package com.bravo.controller;
 
+import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.JFrame;
+
+import com.bravo.App;
 import com.bravo.model.*;
 import com.bravo.utils.Mysql;
 import com.bravo.utils.Utils;
+import com.bravo.view.EventDialog;
+import com.bravo.view.MainWindow;
 
 public class EventController {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+	public final int timeSlot = 15; // In minutes
+	public User user = new User(-4);
+	private MainWindow mainWindow;
+	private ArrayList<Integer> overwrittenEvents;
     
-	public EventController() {
+	public EventController(MainWindow mw) {
+		mainWindow = mw;
 	}
 
-	public void addEvent(Event e, ArrayList<Long> eventUsers, boolean isUpdating, boolean repeatEdit) {
-		for (int i = 0; i < eventUsers.size(); i += 1) {
-			if (isUpdating && !repeatEdit) { e.repeat = 1;} 
-			long timeCounter = e.date.getTime();
-			for (int j = 0; j < e.repeat; j += 1) {
-				String eventParsedDate = dateFormat.format(timeCounter);
-				timeCounter += (86400000*7);
-				if (e.type.equals("Static") || (e.type.equals("Dynamic") && isUpdating)) {
-					ArrayList<HashMap<String,Object>> currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND start='"+e.start+"' AND date='"+eventParsedDate+"'");
-					if (!isUpdating || currentEvents.size() == 0) {
-						Mysql.query("INSERT INTO timetable (userId, name, type, start, end, date, location, priority) VALUES ('"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"')");
-					} else {
-						HashMap<String,Object> currentEvent = currentEvents.get(0);
-						
-						//Removes repeat events which are no longer valid
-						int oldRepeat = calcRepeating(currentEvent);
-						long timeCounterDel = e.date.getTime();
-						if (j == 0 && repeatEdit && oldRepeat > 1 && e.repeat < oldRepeat) {
-							for (int k = 0; k < oldRepeat; k += 1) {
-								if (k >= e.repeat) {
-									String eventParsedDateDel = dateFormat.format(timeCounterDel);
-									Mysql.query("DELETE FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND name='"+e.name+"' AND type='"+e.type+"' AND start='"+e.start+"' AND end='"+e.end+"' AND date='"+eventParsedDateDel+"' AND location='"+e.location+"' AND priority='"+e.priority+"'");
-								}
-								timeCounterDel += (86400000*7);
-							}
-						}
-						
-						//Handle event update/creation
-						if (currentEvent.get("type").equals("Static")) {
-							if ((Integer) currentEvent.get("priority") > e.priority) {
-								//If type is static with higher priority, notify user that event cannot be overwritten and request new slot (or dynamically allocate)
-							} else if ((Integer) currentEvent.get("priority") < e.priority) {
-								//If type is static with lower priority, confirm overwrite, find out if user wants to reschedule the replaced event
-							} else {
-								//If type is static with equal priority, request choice, overwrite and request reschedule
-							}
-						} else if (currentEvent.get("type").equals("Dynamic")) {
-							if ((Integer) currentEvent.get("priority") > e.priority) {
-								//[Logically this should never occur]
-								//If type is dynamic with higher priority, schedule event for another time (Dynamically, static events will never be overuled by dynamic)
-							} else if ((Integer) currentEvent.get("priority") < e.priority) {
-								//If type is dynamic with lower priority, schedule event and reschedule any overwritten events dynamically
-							} else {
-								//[Logically this should never occur]
-								//If type is dynamic with equal priority, then schedule event elsewhere
-							}
-						}
-						Mysql.query("UPDATE timetable SET userId='"+eventUsers.get(i)+"', name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', date='"+eventParsedDate+"', location='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+currentEvent.get("eventId")+"'");
+	public boolean addEvent(Event e, int chainLength, ArrayList<Long> eventUsers, boolean isUpdating, boolean repeatEdit) {
+		boolean successful = true;
+		overwrittenEvents = new ArrayList<Integer>();
+		
+		if (e.type.equals("Static") || (e.type.equals("Dynamic") && isUpdating)) {
+			boolean clashFree = true;
+			boolean otherUser = false;
+			boolean chainClash = false;
+			for (int i = 0; i < eventUsers.size(); i += 1) {
+				long timeCounter = e.date.getTime();
+				for (int j = 0; j < chainLength; j += 1) {
+					String eventParsedDate = dateFormat.format(timeCounter);
+					timeCounter += (86400000*7);
+					if (!slotFree(e.eventId,e.start,e.end,eventParsedDate,eventUsers.get(i))) {
+						clashFree = false;
+						if (eventUsers.get(i) != user.getId()) { otherUser = true;}
+						if (chainLength > 1) { chainClash = true;}
+						break;
 					}
-				} else if (e.type.equals("Dynamic") && !isUpdating) {
-					//Dynamic Algorithm to go here
 				}
 			}
+			
+			int newId = (int)Mysql.queryTerm("id","timetable","ORDER BY id DESC LIMIT 1")+1;
+			if (clashFree || (!clashFree && !otherUser && !chainClash && Utils.question("This event clashes with a pre-existing event, would you like to overwrite?")) || (!clashFree && !otherUser && chainClash && Utils.question("This event chain clashes with a pre-existing event, would you like to overwrite? (You will not be able to reschedule the overwritten event)"))) {
+				for (int i = 0; i < eventUsers.size(); i += 1) {
+					long timeCounter = e.date.getTime();
+					for (int j = 0; j < chainLength; j += 1) {
+						String eventParsedDate = dateFormat.format(timeCounter);
+						timeCounter += (86400000*7);
+						if (isUpdating) {
+							newId = e.eventId;
+							Mysql.query("UPDATE timetable SET name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', " +
+								"date='"+eventParsedDate+"', location='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
+						} else {
+							Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority) " +
+								"VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"')");
+							//if (j != 0) { Mysql.query
+						}
+					}
+				}
+				if (!clashFree && !chainClash && Utils.question("Do you want to reschedule the overwritten event?")) {
+					/*HashMap<String,Object> overwrittenEvent = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"' AND name='"+e.name+"' AND type='"+e.type+"' AND start='"+e.start+"' AND end='"+e.end+"', date='"+e.date+"', location='"+e.location+"', priority='"+e.priority+"'").get(0);
+					EventDialog eventDialog = new EventDialog(mainWindow, this, App.getApplication().getMainFrame(), true, user.getId(), (String)overwrittenEvent.get("start"), (String)overwrittenEvent.get("date"), (int)overwrittenEvent.get("eventId"));
+					eventDialog.pack();
+					eventDialog.setLocationRelativeTo(null);
+					eventDialog.setSize(new Dimension(400, 400));
+					eventDialog.setVisible(true);*/
+					Utils.error("Currently unable to reschedule events");
+					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM timetable WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
+				} else if (!clashFree) {
+					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM timetable WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
+				}
+			} else {
+				if (otherUser) { Utils.error("This event clashes with an event of another user, it is recommended that you use a dynamic event when scheduling for multiple users");}
+				successful = false;
+			}
+		} else {
+			//Dynamic algorithm
 		}
+		
+		return successful;
+	}
+	
+	public boolean slotFree(int eventId, String start, String end, String date, long userId) {
+		int timeSlots = (Utils.timeToMin(end) - Utils.timeToMin(start))/timeSlot;
+		boolean free = true;
+		for (int i = 0; i < timeSlots; i += 1) {
+			String time = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*i));
+			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start='"+time+"' AND date='"+date+"'");
+			if (eventInSlot != null && (Integer) eventInSlot != eventId) {
+				if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
+				free= false;
+			}
+		}
+		return free;
 	}
     
     public int calcRepeating(HashMap<String,Object> currentEvent) {

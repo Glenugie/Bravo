@@ -30,6 +30,7 @@ public class EventDialog extends javax.swing.JDialog {
 	private EventController eventController;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	private long userId;
+	private int eId;
 	private String eS;
 	private String eE;
 	private String eD;
@@ -45,17 +46,19 @@ public class EventDialog extends javax.swing.JDialog {
 	private JTextField eventLocation;
 	private JComboBox<String> eventPriority;
 	private JButton eventButton;
+	private HashMap<String,Object> currentEvent;
 	ArrayList<Long> eventUsers;
 
-    public EventDialog(MainWindow mainWindow, EventController eventController, java.awt.Frame parent, boolean modal, long uId, String eS, String eD, int tS) {
+    public EventDialog(MainWindow mainWindow, EventController eventController, java.awt.Frame parent, boolean modal, long uId, String eS, String eD, int eId) {
         super(parent, modal);
         this.mainWindow = mainWindow;
         this.eventController = eventController;
         userId = uId;
+        this.eId = eId;
         this.eS = Utils.minToTime(Integer.parseInt(eS));
         this.eE = Utils.minToTime(Integer.parseInt(eS)+tS);
         this.eD = eD;
-        this.tS = tS;
+        this.tS = eventController.timeSlot;
         eventUsers = new ArrayList<Long>();
 		eventUsers.add(userId);
 
@@ -76,8 +79,12 @@ public class EventDialog extends javax.swing.JDialog {
 
     private void initMyComponents() {
         this.setTitle(("Event"));
-        ArrayList<HashMap<String,Object>> currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
-        HashMap<String,Object> currentEvent;
+        ArrayList<HashMap<String,Object>> currentEvents;
+        if (eId == -1) {
+        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
+        } else {
+        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"', eventId='"+eId+"'");
+        }
         String buttonText = "";
         if (currentEvents.size() > 0) { 
         	buttonText = "Update Event";
@@ -197,9 +204,10 @@ public class EventDialog extends javax.swing.JDialog {
 				} else if (repeat <= 0){
 					Utils.error("Repeat value must be greater than or equal to 1");
 				} else {
-					eventController.addEvent(new Event(0,0,name,type,start,end,date,repeat,location,priority),eventUsers, isUpdating, eventRepeatEdit.isSelected());
-					mainWindow.update();
-					dispose();
+					if (eventController.addEvent(new Event((int)currentEvent.get("eventId"),userId,name,type,start,end,date,location,priority),repeat,eventUsers,isUpdating,eventRepeatEdit.isSelected())) { //If event is successful
+						mainWindow.update();
+						dispose();
+					}
 				}
     		} catch (Exception e) {
     			e.printStackTrace();

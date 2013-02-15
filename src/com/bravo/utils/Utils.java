@@ -18,6 +18,13 @@ public class Utils {
 		return timeArray[0]+":"+timeArray[1];
 	}
 	
+	public static int timeToMin(String s) {
+		String[] timeArray = s.split(":");
+		int hour = Integer.parseInt(timeArray[0]);
+		int min = Integer.parseInt(timeArray[1]);
+		return (hour*60)+min;
+	}
+	
 	public static String passEncrypt(char[] password) {
 		byte[] pass = null;
 		MessageDigest md = null;
@@ -50,6 +57,14 @@ public class Utils {
 	
 	public static boolean confirm(String message) {
 		if (JOptionPane.showConfirmDialog(null, message, "Confirm", JOptionPane.OK_CANCEL_OPTION) == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static boolean question(String message) {
+		if (JOptionPane.showConfirmDialog(null, message, "Question", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
 			return true;
 		} else {
 			return false;
