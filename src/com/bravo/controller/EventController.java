@@ -106,7 +106,7 @@ public class EventController {
 				free= false;
 			}
 		}
-		Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>='"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
+		Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>'"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
 		if (eventInSlot != null) {
 			if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
 			free= false;
