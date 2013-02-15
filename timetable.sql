@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `timetable` (
   `end` varchar(5) NOT NULL,
   `date` varchar(50) NOT NULL,
   `location` varchar(50) NOT NULL,
-  `priority` varchar(50) NOT NULL,
+  `priority` int(11) NOT NULL,
   PRIMARY KEY (`eventId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
