@@ -55,10 +55,10 @@ public class EventDialog extends javax.swing.JDialog {
         this.eventController = eventController;
         userId = uId;
         this.eId = eId;
+        this.tS = eventController.timeSlot;
         this.eS = Utils.minToTime(Integer.parseInt(eS));
         this.eE = Utils.minToTime(Integer.parseInt(eS)+tS);
         this.eD = eD;
-        this.tS = eventController.timeSlot;
         eventUsers = new ArrayList<Long>();
 		eventUsers.add(userId);
 
@@ -90,12 +90,12 @@ public class EventDialog extends javax.swing.JDialog {
         	buttonText = "Update Event";
         	isUpdating = true;
         	currentEvent = currentEvents.get(0);
-        	currentEvent.put("repeat", ""+eventController.calcRepeating(currentEvent));
+        	currentEvent.put("repeat", ""+eventController.calcRepeating(new Event((int) currentEvent.get("eventId"))));
         } else { 
         	buttonText = "Create Event";
         	isUpdating = false;
         	currentEvent = new HashMap<String,Object>();
-        	currentEvent.put("eventId", "");
+        	currentEvent.put("eventId", "-1");
         	currentEvent.put("userId", "");
         	currentEvent.put("name", "");
         	currentEvent.put("type", "");
@@ -204,7 +204,8 @@ public class EventDialog extends javax.swing.JDialog {
 				} else if (repeat <= 0){
 					Utils.error("Repeat value must be greater than or equal to 1");
 				} else {
-					if (eventController.addEvent(new Event((int)currentEvent.get("eventId"),userId,name,type,start,end,date,location,priority),repeat,eventUsers,isUpdating,eventRepeatEdit.isSelected())) { //If event is successful
+					int tempId; try { tempId = Integer.parseInt((String) currentEvent.get("eventId"));} catch (Exception e) { tempId = (int)currentEvent.get("eventId");}
+					if (eventController.addEvent(new Event(tempId,userId,name,type,start,end,date,location,priority),repeat,eventUsers,isUpdating,eventRepeatEdit.isSelected())) { //If event is successful
 						mainWindow.update();
 						dispose();
 					}

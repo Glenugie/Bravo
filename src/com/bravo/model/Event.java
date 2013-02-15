@@ -1,10 +1,13 @@
 package com.bravo.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import com.bravo.utils.*;
 
 public class Event {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	public int eventId;
 	public long userId;
 	public String name;
@@ -37,7 +40,11 @@ public class Event {
 		type = (String) eventQuery.get("type");
 		start = (String) eventQuery.get("start");
 		end = (String) eventQuery.get("end");
-		date = (Date) eventQuery.get("date");
+		try {
+			date = dateFormat.parse((String) eventQuery.get("date"));
+		} catch (ParseException e) {
+			System.err.println("Unable to parse date");
+		}
 		chain = (int) eventQuery.get("nextChain");
 		location = (String) eventQuery.get("location");
 		priority = (int) eventQuery.get("priority");
