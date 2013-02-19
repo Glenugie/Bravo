@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `timetable` (
   `location` varchar(50) NOT NULL,
   `priority` int(11) NOT NULL,
   `nextChain` int(11) NOT NULL,
-  PRIMARY KEY (`eventId`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`userId`, `username`, `password`, `email`) VALUES
-(1, 'test', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', 'test');
+(1, 'test', 'ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff', 'test');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
