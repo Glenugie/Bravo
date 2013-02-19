@@ -89,9 +89,9 @@ public class RegisterDialog extends javax.swing.JDialog {
 	    			} else if (!email.getText().equals(confirmEmail.getText())) {
 	    				Utils.error("Email addresses do not match");
 	    			} else {
-	    				Mysql.query("INSERT INTO users (username, email, password) VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(password.getPassword())+"', '"+email.getText()+"')");
+	    				Mysql.query("INSERT INTO users (username, password, email) VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(password.getPassword())+"', '"+email.getText()+"')");
 		    			ArrayList<HashMap<String, Object>> userIdCheck = Mysql.query("SELECT userId FROM users WHERE username='"+username.getText()+"'");
-	    				mainWindow.setUser((Long) userIdCheck.get(0).get("userId"));
+	    				mainWindow.setUser(((Integer) userIdCheck.get(0).get("userId")).longValue());
 	    				dispose();
 	    			}
     			} else {

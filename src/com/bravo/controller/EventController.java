@@ -3,9 +3,11 @@ package com.bravo.controller;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import com.bravo.App;
 import com.bravo.model.*;
@@ -16,6 +18,7 @@ import com.bravo.view.MainWindow;
 
 public class EventController {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm");
 	public final int timeSlot = 15; // In minutes
 	public User user = new User(-4);
 	private MainWindow mainWindow;
@@ -89,7 +92,13 @@ public class EventController {
 				successful = false;
 			}
 		} else {
-			//Dynamic algorithm
+			String dynamicSchedule = dynamicSchedule(eventUsers,e);
+			System.out.println("Slot selected: "+dynamicSchedule);
+			if (dynamicSchedule.equals("")) {
+				successful = false;
+			} else {
+				//Schedule event in returned slot
+			}
 		}
 		
 		return successful;
@@ -114,6 +123,66 @@ public class EventController {
 		return free;
 	}
     
+	public String dynamicSchedule(ArrayList<Long> eventUsers, Event e) {
+		int currentMinute = Utils.timeToMin(timestamp.format(new Date().getTime()));
+		String currentDate = dateFormat.format(new Date().getTime());
+		
+		String returnValue = "";
+		int startDay = 0;
+		boolean successful = false;
+		
+		while (!successful) {
+			ArrayList<String> allSlots = new ArrayList<String>();
+			String date = dateFormat.format(e.date.getTime());
+			for (int day = startDay; day < (startDay+7); day += 1) {
+				for (int i = 0; i < 1440; i += timeSlot) {
+					String slotToAdd = date+" "+Utils.minToTime(i);
+					if ((date.equals(currentDate) && i > currentMinute) || !date.equals(currentDate)) {
+						allSlots.add(slotToAdd);
+					}
+				}
+				date = dateFormat.format(e.date.getTime() + (86400000 * (day + 1)));
+			}
+			
+			for (int i = 0; i < eventUsers.size(); i += 1) {
+				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"'");
+				//For each event
+					//Remove each slot which is >= Start and < End
+			}
+			
+			for (int i = (allSlots.size() - 1); i >= 0; i -= 1) {
+				//Remove sets of slots which do not fit event duration
+			}
+			
+			//Add up total free slots for each day, select the day with the highest value
+			
+			if (allSlots.size() == 0) {
+				Object[] options = {"Check next 7 days", "Find Best Fit", "Cancel Scheduling"};
+				int noEvents = JOptionPane.showOptionDialog(null, "There are no slots in the next week that can accommodate all attendees", "No Available Slots", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+				if (noEvents == JOptionPane.YES_OPTION) {
+					startDay += 7;
+				} else if (noEvents == JOptionPane.NO_OPTION) {
+					//Redefine all slots to find best fit
+				} else {
+					successful = true;
+				}
+			}
+			
+			if (allSlots.size() > 0) {
+				ArrayList<String> availableSlots = new ArrayList<String>();
+				//Select slots with at least one free slot ahead and behind
+				//If no free slots remaining
+					//Undo previous action
+				//From remaining slots, select slot which is closest to 2PM (Later this can be working day)
+				//While user disagrees with chosen slot
+					//Remove slot from list and offer next available slot
+				//Schedule event in the chosen slot for all users
+			}
+		}
+		
+		return returnValue;
+	}
+	
     public int calcRepeating(Event e) {
     	int repeatCounter = 1;
     	while (e.chain != -1) {
