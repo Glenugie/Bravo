@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 12, 2013 at 10:38 PM
+-- Generation Time: Feb 20, 2013 at 12:11 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
@@ -19,6 +19,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `timetable`
 --
+CREATE DATABASE `timetable` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `timetable`;
 
 -- --------------------------------------------------------
 
@@ -39,7 +41,15 @@ CREATE TABLE IF NOT EXISTS `timetable` (
   `priority` int(11) NOT NULL,
   `nextChain` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `timetable`
+--
+
+INSERT INTO `timetable` (`id`, `eventId`, `userId`, `name`, `type`, `start`, `end`, `date`, `location`, `priority`, `nextChain`) VALUES
+(1, 1, 1, 'Test', 'Static', '00:00', '01:00', '16 Feb 2013', '', 6, -1),
+(3, 2, 1, 'Test2', 'Static', '01:00', '01:30', '16 Feb 2013', '', 6, -1);
 
 -- --------------------------------------------------------
 
