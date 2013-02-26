@@ -19,6 +19,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
@@ -28,7 +29,7 @@ public class EventDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905584352089849L;
 	private MainWindow mainWindow;
 	private EventController eventController;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
 	private long userId;
 	private int eId;
 	private String eS;
@@ -47,7 +48,9 @@ public class EventDialog extends javax.swing.JDialog {
 	private JComboBox<String> eventPriority;
 	private JButton eventButton;
 	private HashMap<String,Object> currentEvent;
-	ArrayList<Long> eventUsers;
+	private ArrayList<Long> eventUsers;
+	private JPanel userPanel;
+    private ArrayList<JCheckBox> userCBs;
 
     public EventDialog(MainWindow mainWindow, EventController eventController, java.awt.Frame parent, boolean modal, long uId, String eS, String eD, int eId) {
         super(parent, modal);
@@ -61,6 +64,7 @@ public class EventDialog extends javax.swing.JDialog {
         this.eD = eD;
         eventUsers = new ArrayList<Long>();
 		eventUsers.add(userId);
+		userCBs = new ArrayList<JCheckBox>();
 
         
         initComponents();
@@ -79,6 +83,7 @@ public class EventDialog extends javax.swing.JDialog {
 
     private void initMyComponents() {
         this.setTitle(("Event"));
+        JPanel overarchingPanel = new JPanel(new SpringLayout());
         ArrayList<HashMap<String,Object>> currentEvents;
         if (eId == -1) {
         	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
@@ -173,7 +178,13 @@ public class EventDialog extends javax.swing.JDialog {
         eventPanel.add(eventButton);
         eventPanel.add(new JLabel(""));
         SpringUtilities.makeCompactGrid(eventPanel, 9, 2, 10, 10, 10, 10);
-        this.add(eventPanel);
+        
+        updateUserPanel();
+        overarchingPanel.add(eventPanel);
+        overarchingPanel.add(userPanel);
+        SpringUtilities.makeCompactGrid(overarchingPanel, 1, 2, 10, 10, 10, 10);
+        
+        this.add(overarchingPanel);
     }    
     ActionListener eventButtonAL = new ActionListener() {
         @Override
@@ -213,6 +224,44 @@ public class EventDialog extends javax.swing.JDialog {
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
+        }
+    };
+
+    private void updateUserPanel() {
+    	userPanel = new JPanel(new SpringLayout());
+    	ArrayList<User> allUsers = new ArrayList<User>();
+    	for (HashMap<String,Object> user : Mysql.query("SELECT userId FROM users WHERE userId!='"+userId+"'")) {
+    		allUsers.add(new User(new Integer((int) user.get("userId")).longValue()));
+    	}
+    	
+    	JPanel subPanel = new JPanel(new SpringLayout());
+    	for (User user : allUsers) {
+            JCheckBox selectUser = new JCheckBox();
+    		selectUser.setName(new Long(user.getId()).toString());
+    		selectUser.setSelected(eventUsers.contains(new Long(user.getId())));
+            selectUser.addActionListener(selectUserAL);
+            userCBs.add(selectUser);
+            subPanel.add(selectUser);
+    		subPanel.add(new JLabel(user.getName()));
+    	}
+        SpringUtilities.makeCompactGrid(subPanel, allUsers.size(), 2, 10, 10, 10, 10);
+    	JScrollPane userListPanel = new JScrollPane(subPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	
+    	userPanel.add(new JLabel("Users:"));
+    	userPanel.add(userListPanel);    	
+        SpringUtilities.makeCompactGrid(userPanel, 2, 1, 10, 10, 10, 10);
+    }
+    ActionListener selectUserAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+        	JCheckBox cb = (JCheckBox) actionEvent.getSource();
+        	if (cb.isSelected()) {
+        		eventUsers.add(Long.parseLong(cb.getName()));
+        		System.out.println("Add");
+        	} else {
+        		eventUsers.remove(Long.parseLong(cb.getName()));
+        		System.out.println("Remove");
+        	}
         }
     };
 

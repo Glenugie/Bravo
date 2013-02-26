@@ -117,7 +117,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), name[0], name[1],-1);
 			eventDialog.pack();
 			eventDialog.setLocationRelativeTo(null);
-			eventDialog.setSize(new Dimension(400, 400));
+			eventDialog.setSize(new Dimension(600, 400));
 			eventDialog.setVisible(true);
 		}
 	};
