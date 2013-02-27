@@ -257,10 +257,8 @@ public class EventDialog extends javax.swing.JDialog {
         	JCheckBox cb = (JCheckBox) actionEvent.getSource();
         	if (cb.isSelected()) {
         		eventUsers.add(Long.parseLong(cb.getName()));
-        		System.out.println("Add");
         	} else {
         		eventUsers.remove(Long.parseLong(cb.getName()));
-        		System.out.println("Remove");
         	}
         }
     };
