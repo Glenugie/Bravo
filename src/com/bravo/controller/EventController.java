@@ -98,6 +98,7 @@ public class EventController {
 				successful = false;
 			} else {
 				//Schedule event in returned slot
+				//Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority, nextChain) " + "VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"', '-1')");
 			}
 		}
 		

@@ -7,7 +7,7 @@ import java.util.HashMap;
 public class Mysql {
 	//Mysql server can't be behind a proxy, hence it's using a local server for now (You have to allow 127.0.0.1 to bypass proxy on your machine)
 	//The uni server would require it to pass through a http proxy
-	private static String server = "jdbc:mysql://127.0.0.1:3306/timetable?user=root&password=";
+	private static String server = "jdbc:mysql://127.0.0.1:3306/shiftout_cs3024b?user=shiftout_cs3024b&password=cs3024bpassword";
 	
 	public static boolean testConnection() {
 		System.out.println("Testing Mysql Conection...");
