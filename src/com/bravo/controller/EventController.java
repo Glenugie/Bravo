@@ -110,7 +110,8 @@ public class EventController {
 		boolean free = true;
 		for (int i = 0; i < timeSlots; i += 1) {
 			String time = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*i));
-			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND date='"+date+"' AND eventId!='"+eventId+"' AND (start='"+time+"' OR end='"+time+"')");
+			String endTime = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*(i+1)));
+			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND date='"+date+"' AND eventId!='"+eventId+"' AND (start='"+time+"' OR end='"+endTime+"')");
 			if (eventInSlot != null) {
 				if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
 				free= false;
