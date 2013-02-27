@@ -136,7 +136,9 @@ public class EventController {
 		while (!successful) {
 			ArrayList<String> allSlots = new ArrayList<String>();
 			ArrayList<String> allDates = new ArrayList<String>();
-			String date = dateFormat.format(e.date.getTime());
+			String date = dateFormat.format(e.date.getTime() + (86400000 * startDay));
+			
+			//Constructs a list of all slots
 			for (int day = startDay; day < (startDay+7); day += 1) {
 				allDates.add(date);
 				for (int i = 0; i < 1440; i += timeSlot) {
@@ -147,34 +149,42 @@ public class EventController {
 				}
 				date = dateFormat.format(e.date.getTime() + (86400000 * (day + 1)));
 			}
-			
+
+			System.out.println(allSlots.toString());
+			//Removes slots from the list which are filled by another event
 			for (int i = 0; i < eventUsers.size(); i += 1) {
 				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date<'"+date+"'");
 				for (HashMap<String,Object> event : userEvents) {
 					int timeSlots = (Utils.timeToMin((String)event.get("end")) - Utils.timeToMin((String)event.get("start")))/timeSlot;
 					for (int j = 0; j < timeSlots; j += 1) {
-						allSlots.remove(Utils.minToTime(Utils.timeToMin((String)event.get("start")) + (timeSlot*i)));
+						allSlots.remove((String)event.get("date")+" "+Utils.minToTime(Utils.timeToMin((String)event.get("start")) + (timeSlot*i)));
 					}
 				}
 			}
 			System.out.println(allSlots.toString());
-			
+
+			//Remove sets of slots which do not fit event duration
 			for (int i = (allSlots.size() - 1); i >= 0; i -= 1) {
-				//Remove sets of slots which do not fit event duration
+				/*=====To Write=====*/
 			}
 
 			boolean newDate = true;
-			while (newDate) {
+			while (newDate && allDates.size() > 0) {
+				//Choose a date for the event
 				String chosenDate = "";
 				int lastCounter = (((24*60)/timeSlot)*eventUsers.size())+1;
 				for (String d : allDates) {
-					ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE date='"+d+"'");
-					int counter = userEvents.size();
+					int counter = 0;
+					for (int i = 0; i < eventUsers.size(); i += 1) {
+						ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date='"+d+"'");
+						counter += userEvents.size();
+					}
 					if (counter < lastCounter) { chosenDate = d;}
 					lastCounter = counter;
 				}
 				newDate = false;
 				
+				//No available slots, get action choice from user
 				if (allSlots.size() == 0) {
 					Object[] options = {"Check next 7 days", "Find Best Fit", "Cancel Scheduling"};
 					int noEvents = JOptionPane.showOptionDialog(null, "There are no slots in the next week that can accommodate all attendees", "No Available Slots", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
@@ -182,12 +192,15 @@ public class EventController {
 						startDay += 7;
 					} else if (noEvents == JOptionPane.NO_OPTION) {
 						//Redefine all slots to find best fit
+						/*=====To Write=====*/
 					} else {
 						successful = true;
 					}
 				}
 				
+				//If there are available slots
 				if (allSlots.size() > 0) {
+					//Add slots to new list that have a free slots before and after
 					ArrayList<String> availableSlots = new ArrayList<String>();
 					int counter = 0; String lastSlot = chosenDate+" 00:00";
 					for (int i = 0; i < allSlots.size(); i += 1) {
@@ -202,6 +215,7 @@ public class EventController {
 						}
 					}
 					
+					//If no slots were caught in the above filter, add all free slots
 					if (availableSlots.size() == 0) {
 						availableSlots.clear();
 						for (int i = 0; i < allSlots.size(); i += 1) {
@@ -215,9 +229,11 @@ public class EventController {
 					String chosenSlot = "";
 					while (!agrees) {
 						//Select slot which is closest to 2PM (Later this can be middle of working day)
+						/*=====To Write=====*/
 						
+						//Get user to confirm slot
 						Object[] options = {"Schedule Event", "Show Next Slot", "Cancel Scheduling"};
-						int confirm = JOptionPane.showOptionDialog(null, "Slot selected: "+chosenDate+" "+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+						int confirm = JOptionPane.showOptionDialog(null, "Slot selected: "+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 						if (confirm == JOptionPane.YES_OPTION) {
 							agrees = true;
 						} else if (confirm == JOptionPane.NO_OPTION) {
@@ -226,20 +242,25 @@ public class EventController {
 							successful = true;
 							agrees = true;
 						}
+						
+						//If user has rejected all slots on this date, get a new one
 						if (availableSlots.size() == 0) { 
 							newDate = true;
 							for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}
 						}
 					}
 					
-					if (availableSlots.size() == 0) {
-						successful = true;
-					}
-					
 					if (!successful) {
 						//Schedule event in the chosen slot for all users
+						/*=====To Write=====*/
 					}
 				}
+			}
+			
+			//Ran out of dates in current period to suggest to user
+			if (allDates.size() == 0) { 
+				Utils.error("No more slots left to select in current date period, try setting a later start date");
+				successful = true;
 			}
 		}
 		
