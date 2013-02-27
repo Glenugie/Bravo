@@ -147,7 +147,7 @@ public class EventController {
 			}
 			
 			for (int i = 0; i < eventUsers.size(); i += 1) {
-				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"'");
+				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date<'"+date+"'");
 				//For each event
 					//Remove each slot which is >= Start and < End
 			}
