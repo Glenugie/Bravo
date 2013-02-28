@@ -150,7 +150,6 @@ public class EventController {
 				date = dateFormat.format(e.date.getTime() + (86400000 * (day + 1)));
 			}
 
-			System.out.println(allSlots.toString());
 			//Removes slots from the list which are filled by another event
 			for (int i = 0; i < eventUsers.size(); i += 1) {
 				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date<'"+date+"'");
@@ -161,7 +160,6 @@ public class EventController {
 					}
 				}
 			}
-			System.out.println(allSlots.toString());
 
 			//Remove sets of slots which do not fit event duration
 			for (int i = (allSlots.size() - 1); i >= 0; i -= 1) {
@@ -237,11 +235,18 @@ public class EventController {
 						}
 						while (!slotFound) {
 							slotUp = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotUp.split(" ")[3])+timeSlot);
-							slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotUp.split(" ")[3])-timeSlot);
-							if (availableSlots.contains(slotUp)) {
+							slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotDown.split(" ")[3])-timeSlot);
+							int diffUp = Math.abs(Utils.timeToMin(slotUp.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
+							int diffDown = Math.abs(Utils.timeToMin(slotDown.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
+							System.out.println("Up: "+slotUp+" - "+diffUp);
+							System.out.println("Down: "+slotDown+" - "+diffDown);
+							if (availableSlots.contains(slotUp) && diffUp <= diffDown) {
 								slotFound = true;
 								chosenSlot = slotUp;
-							} else if (availableSlots.contains(slotDown)) {
+								if (availableSlots.contains(slotDown)) { 
+									slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotDown.split(" ")[3])+timeSlot);
+								}
+							} else if (availableSlots.contains(slotDown) && diffUp >= diffDown) {
 								slotFound = true;
 								chosenSlot = slotDown;
 							}
