@@ -93,12 +93,15 @@ public class EventController {
 			}
 		} else {
 			String dynamicSchedule = dynamicSchedule(eventUsers,e);
-			System.out.println("Slot selected: "+dynamicSchedule);
 			if (dynamicSchedule.equals("")) {
 				successful = false;
 			} else {
-				//Schedule event in returned slot
-				//Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority, nextChain) " + "VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"', '-1')");
+				String[] parsedEvent = dynamicSchedule.split(" ");
+				String parsedDate = parsedEvent[0]+" "+parsedEvent[1]+" "+parsedEvent[2];
+				int newId; try{ newId = (int)Mysql.queryTerm("id","timetable","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
+				for (int i = 0; i < eventUsers.size(); i += 1) {
+					Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority, nextChain) " + "VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+parsedEvent[3]+"', '"+parsedEvent[4]+"', '"+parsedDate+"', '"+e.location+"', '"+e.priority+"', '-1')");
+				}
 			}
 		}
 		
@@ -162,8 +165,21 @@ public class EventController {
 			}
 
 			//Remove sets of slots which do not fit event duration
-			for (int i = (allSlots.size() - 1); i >= 0; i -= 1) {
-				/*=====To Write=====*/
+			int timeSlots = (Utils.timeToMin(e.end) - Utils.timeToMin(e.start))/timeSlot;
+			ArrayList<String> removeSlots = new ArrayList<String>();
+			for (int i = 0; i < (allSlots.size()-3); i += 1) {
+				int consecutiveSlots = 0;
+				for (int j = 0; j <= timeSlots; j += 1) {
+					if (Utils.minToTime(Utils.timeToMin(allSlots.get(i).split(" ")[3])+(timeSlot*j)).equals(allSlots.get(i+j).split(" ")[3])) {
+						consecutiveSlots += 1;
+					}
+				}
+				if (consecutiveSlots == timeSlots) {
+					removeSlots.add(allSlots.get(i));
+				}
+			}
+			for (String rS : removeSlots) {
+				allSlots.remove(rS);
 			}
 
 			boolean newDate = true;
@@ -279,7 +295,7 @@ public class EventController {
 					//Haven't force quit, therefore continue
 					if (!successful) {
 						successful = true;
-						returnValue = chosenSlot;
+						returnValue = chosenSlot+" "+Utils.minToTime(Utils.timeToMin(chosenSlot.split(" ")[3])+(timeSlot*timeSlots));
 					}
 				}
 			}
