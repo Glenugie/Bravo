@@ -238,8 +238,6 @@ public class EventController {
 							slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotDown.split(" ")[3])-timeSlot);
 							int diffUp = Math.abs(Utils.timeToMin(slotUp.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
 							int diffDown = Math.abs(Utils.timeToMin(slotDown.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
-							System.out.println("Up: "+slotUp+" - "+diffUp);
-							System.out.println("Down: "+slotDown+" - "+diffDown);
 							if (availableSlots.contains(slotUp) && diffUp <= diffDown) {
 								slotFound = true;
 								chosenSlot = slotUp;
@@ -278,9 +276,10 @@ public class EventController {
 					
 					if (newDate) { for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}}
 					
+					//Haven't force quit, therefore continue
 					if (!successful) {
-						//Schedule event in the chosen slot for all users
-						/*=====To Write=====*/
+						successful = true;
+						returnValue = chosenSlot;
 					}
 				}
 			}
