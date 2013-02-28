@@ -229,26 +229,49 @@ public class EventController {
 					String chosenSlot = "";
 					while (!agrees) {
 						//Select slot which is closest to 2PM (Later this can be middle of working day)
-						/*=====To Write=====*/
-						
-						//Get user to confirm slot
-						Object[] options = {"Schedule Event", "Show Next Slot", "Cancel Scheduling"};
-						int confirm = JOptionPane.showOptionDialog(null, "Slot selected: "+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-						if (confirm == JOptionPane.YES_OPTION) {
-							agrees = true;
-						} else if (confirm == JOptionPane.NO_OPTION) {
-							availableSlots.remove(chosenSlot);
-						} else {
-							successful = true;
-							agrees = true;
+						String startSlot = chosenDate+" 14:00",slotUp = startSlot, slotDown = startSlot;
+						boolean slotFound = false;
+						if (availableSlots.contains(startSlot)) { 
+							chosenSlot = startSlot;
+							slotFound = true;
+						}
+						while (!slotFound) {
+							slotUp = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotUp.split(" ")[3])+timeSlot);
+							slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotUp.split(" ")[3])-timeSlot);
+							if (availableSlots.contains(slotUp)) {
+								slotFound = true;
+								chosenSlot = slotUp;
+							} else if (availableSlots.contains(slotDown)) {
+								slotFound = true;
+								chosenSlot = slotDown;
+							}
+							
+							if (!slotFound && (slotUp.equals(chosenDate+" 00:00") || slotDown.equals(chosenDate+" "+Utils.minToTime(Utils.timeToMin("24:00")-timeSlot)))) {
+								newDate = true;
+							}
 						}
 						
-						//If user has rejected all slots on this date, get a new one
-						if (availableSlots.size() == 0) { 
-							newDate = true;
-							for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}
+						if (!newDate) {
+							//Get user to confirm slot
+							Object[] options = {"Schedule Event", "Show Next Slot", "Cancel Scheduling"};
+							int confirm = JOptionPane.showOptionDialog(null, "Slot selected: "+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+							if (confirm == JOptionPane.YES_OPTION) {
+								agrees = true;
+							} else if (confirm == JOptionPane.NO_OPTION) {
+								availableSlots.remove(chosenSlot);
+							} else {
+								successful = true;
+								agrees = true;
+							}
+							
+							//If user has rejected all slots on this date, get a new one
+							if (availableSlots.size() == 0) { 
+								newDate = true;
+							}
 						}
 					}
+					
+					if (newDate) { for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}}
 					
 					if (!successful) {
 						//Schedule event in the chosen slot for all users

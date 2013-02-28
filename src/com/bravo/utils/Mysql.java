@@ -10,15 +10,22 @@ public class Mysql {
 	private static String server;
 	
 	public static boolean testConnection() {
-		if (System.getProperty("http.proxyHost") == null) { server = nonproxyServer;} else { server = proxyServer;} //Chooses which server to use
+		server = nonproxyServer;
 		System.out.println("Testing Mysql Conection...");
 		try {
 			Class.forName("org.gjt.mm.mysql.Driver");
 			DriverManager.getConnection(server);
-		} catch (Exception e) {
-        	System.out.println("Mysql Connection Failure (Ensure you are connected to the internet, and that you are not going through a HTTP Proxy)");
-			e.printStackTrace();
-        	return false;
+		} catch (Exception e1) {
+        	System.out.println("Mysql Connection Failure using no proxy");
+    		System.out.println("Attempting connection with proxy");
+    		server = proxyServer;
+    		try {
+    			Class.forName("org.gjt.mm.mysql.Driver");
+    			DriverManager.getConnection(server);
+    		} catch (Exception e2) {
+            	System.out.println("Mysql Connection Failure using proxy");
+            	return false;
+    		}
 		}
     	System.out.println("Mysql Connection Success");
 		return true;
