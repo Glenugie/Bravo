@@ -6,10 +6,13 @@ import com.bravo.model.User;
 import com.bravo.utils.*;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,9 +39,11 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private MainWindow mainWindow;
 	private EventController eventController;
 	private User user;
+	private Image bglogo; //will store background image *Denis
 
 	public TimetablePanel(MainWindow mainWindow, EventController eventController) {
         super();
+        
         this.mainWindow = mainWindow;
         this.eventController = eventController;
         this.user = mainWindow.getUser();
@@ -49,6 +55,8 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private void initMyComponents() {
 		if (user.getId() == -4) {
 			this.setLayout(new FlowLayout());
+			//change background color so it would display image on the background
+			
 			this.add(new JLabel("You need to log in to view a timetable"));
 		} else {
 			this.setLayout(new BorderLayout());
@@ -144,6 +152,15 @@ public class TimetablePanel extends javax.swing.JPanel {
 		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date);
 		b.addActionListener(eventButtonAL);
 		timetable.add(b, c);
+	}
+	public void getImage (){   //for backgorund logo *Denis
+		ImageIcon icon = new ImageIcon ("BravoLogo.jpg");
+		bglogo =icon.getImage();
+		
+	}
+	public void paint (Graphics g){  //paint bglogo
+		g.drawImage(bglogo,0,0,getSize().width,getSize().height,this);
+		super.paint(g);
 	}
 
 	/**

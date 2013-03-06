@@ -4,6 +4,8 @@ import com.bravo.controller.*;
 import com.bravo.model.User;
 import com.bravo.utils.*;
 import com.bravo.App;
+
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,8 +35,11 @@ public final class MainWindow extends FrameView {
     private MainWindow mw;
 	
     public MainWindow(SingleFrameApplication app) {
+    	
         super(app);
+        //can be a system println to start testing a connection in case of MySQL execution error
         this.getFrame().setTitle("Dynamic Timetable");
+        
         
         if (!Mysql.testConnection()) {
 			Utils.error("Unable to establish connection to MySQL Server");
@@ -101,6 +106,7 @@ public final class MainWindow extends FrameView {
             LoginDialog loginDialog = new LoginDialog(mw, mainFrame, true);
             loginDialog.pack();
             loginDialog.setLocationRelativeTo(null);
+            loginDialog.setBackground(Color.black); //changes bg color of login panel
             loginDialog.setVisible(true);
             clearOldEvents();
         }

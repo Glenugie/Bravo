@@ -8,7 +8,7 @@ import org.jdesktop.application.SingleFrameApplication;
 public class App extends SingleFrameApplication {
     @Override
     protected void startup() {
-    	System.out.println("Start Application");
+    	System.out.println("Test");
         MainWindow mw = new MainWindow(this);
         show(mw);
         mw.getFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
