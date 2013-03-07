@@ -35,6 +35,7 @@ public class GroupDialog extends javax.swing.JDialog {
         mainWindow = mw;
         groupName = gN;
         groupUsers = new ArrayList<Long>();
+        userCBs = new ArrayList<JCheckBox>();
         userId = mw.getUser().getId();
         initComponents();
         initMyComponents();
@@ -51,7 +52,7 @@ public class GroupDialog extends javax.swing.JDialog {
     
 
     private void initMyComponents() {
-        this.setTitle(("Login"));
+        this.setTitle(("Add Members to Group"));
         userPanel = new JPanel(new SpringLayout());
     	ArrayList<User> allUsers = new ArrayList<User>();
     	for (HashMap<String,Object> user : Mysql.query("SELECT userId FROM users WHERE userId!='"+userId+"'")) {
@@ -71,14 +72,21 @@ public class GroupDialog extends javax.swing.JDialog {
         SpringUtilities.makeCompactGrid(subPanel, allUsers.size(), 2, 10, 10, 10, 10);
     	JScrollPane userListPanel = new JScrollPane(subPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     	
+    	JButton addButton = new JButton("Add Members");
+    	addButton.addActionListener(addButtonAL);
+    	
     	userPanel.add(new JLabel("Users:"));
-    	userPanel.add(userListPanel);    	
+    	userPanel.add(userListPanel);
+    	userPanel.add(addButton);
         SpringUtilities.makeCompactGrid(userPanel, 2, 1, 10, 10, 10, 10);
+        
+        this.add(userPanel);
     }    
-    ActionListener loginButtonAL = new ActionListener() {
+    ActionListener addButtonAL = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
     		try {
+    			//Insert Code Here to be processed on click
     			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();

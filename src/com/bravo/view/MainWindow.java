@@ -114,6 +114,7 @@ public final class MainWindow extends FrameView {
             groupDialog.pack();
             groupDialog.setLocationRelativeTo(null);
             groupDialog.setBackground(Color.black); //changes bg color of login panel
+            groupDialog.setSize(new Dimension(320,275));
             groupDialog.setVisible(true);
     	}
     };
@@ -125,6 +126,7 @@ public final class MainWindow extends FrameView {
             groupDialog.pack();
             groupDialog.setLocationRelativeTo(null);
             groupDialog.setBackground(Color.black); //changes bg color of login panel
+            groupDialog.setSize(new Dimension(320,275));
             groupDialog.setVisible(true);
     	}
     };
