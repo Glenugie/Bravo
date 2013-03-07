@@ -24,14 +24,17 @@ import javax.swing.SpringLayout;
 public class GroupDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905461192089849L;
 	private MainWindow mainWindow;
+	private String groupName;
 	private long userId;
 	private ArrayList<Long> groupUsers;
 	private JPanel userPanel;
     private ArrayList<JCheckBox> userCBs;
 
-    public GroupDialog(MainWindow mw, java.awt.Frame parent, boolean modal) {
+    public GroupDialog(MainWindow mw, java.awt.Frame parent, boolean modal, String gN) {
         super(parent, modal);
         mainWindow = mw;
+        groupName = gN;
+        groupUsers = new ArrayList<Long>();
         userId = mw.getUser().getId();
         initComponents();
         initMyComponents();

@@ -80,7 +80,7 @@ public final class MainWindow extends FrameView {
     }
     
     public JPanel createGroupPanel() {
-        groupPanel = new JPanel();
+        groupPanel = new JPanel(new SpringLayout());
         groupPanel.add(new JLabel("Groups are an abstract concept that don't truly exist in this universe"));
         JButton groupCreate = new JButton("Create Group");
         groupCreate.addActionListener(groupCreateAL);
@@ -91,17 +91,16 @@ public final class MainWindow extends FrameView {
         for (HashMap<String, Object> group : Mysql.query("SELECT * FROM groups")) {
         	groupList.add(new JLabel((String)group.get("groupname")));
         	JButton addMembers = new JButton("Add Members");
-        	JButton createEvent = new JButton("Create Group Event");
-        	if (((Long)group.get("groupleader")) == user.getId()) {
+        	addMembers.setName((String)group.get("groupname"));
+        	addMembers.addActionListener(addMembersAL);
+        	if (((Integer)group.get("groupleader")).longValue() == user.getId()) {
         		groupList.add(addMembers);
-        		groupList.add(createEvent);
         	} else {
-        		groupList.add(new JLabel(""));
         		groupList.add(new JLabel(""));
         	}
         	i += 1;
         }
-        SpringUtilities.makeCompactGrid(groupList, i, 3, 10, 10, 10, 10);
+        SpringUtilities.makeCompactGrid(groupList, i, 2, 10, 10, 10, 10);
         groupPanel.add(groupList);
 
         SpringUtilities.makeCompactGrid(groupPanel, 3, 1, 10, 10, 10, 10);
@@ -112,6 +111,17 @@ public final class MainWindow extends FrameView {
     	public void actionPerformed(ActionEvent actionEvent) {
     		JFrame mainFrame = App.getApplication().getMainFrame();
             GroupCreateDialog groupDialog = new GroupCreateDialog(mw, mainFrame, true);
+            groupDialog.pack();
+            groupDialog.setLocationRelativeTo(null);
+            groupDialog.setBackground(Color.black); //changes bg color of login panel
+            groupDialog.setVisible(true);
+    	}
+    };
+    ActionListener addMembersAL = new ActionListener() {
+    	@Override
+    	public void actionPerformed(ActionEvent actionEvent) {
+    		JFrame mainFrame = App.getApplication().getMainFrame();
+            GroupDialog groupDialog = new GroupDialog(mw, mainFrame, true, ((JButton)actionEvent.getSource()).getName());
             groupDialog.pack();
             groupDialog.setLocationRelativeTo(null);
             groupDialog.setBackground(Color.black); //changes bg color of login panel

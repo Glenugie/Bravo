@@ -170,6 +170,7 @@ public class EventController {
 			for (int i = 0; i < (allSlots.size()-3); i += 1) {
 				int consecutiveSlots = 0;
 				for (int j = 0; j <= timeSlots; j += 1) {
+					//Line below is broken, null pointer
 					if (Utils.minToTime(Utils.timeToMin(allSlots.get(i).split(" ")[3])+(timeSlot*j)).equals(allSlots.get(i+j).split(" ")[3])) {
 						consecutiveSlots += 1;
 					}

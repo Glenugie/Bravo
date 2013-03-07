@@ -61,6 +61,8 @@ public class GroupCreateDialog extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent actionEvent) {
     		try {
     			Mysql.query("INSERT INTO groups (groupname, groupleader) VALUES ('"+groupName.getText()+"', '"+userId+"')");
+    			long groupId = (long)Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName.getText()+"'");
+    			Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+userId+"')");
     			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();
