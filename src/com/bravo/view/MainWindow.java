@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -20,6 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.SpringLayout;
 
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
@@ -80,8 +82,42 @@ public final class MainWindow extends FrameView {
     public JPanel createGroupPanel() {
         groupPanel = new JPanel();
         groupPanel.add(new JLabel("Groups are an abstract concept that don't truly exist in this universe"));
+        JButton groupCreate = new JButton("Create Group");
+        groupCreate.addActionListener(groupCreateAL);
+        groupPanel.add(groupCreate);
+        
+        JPanel groupList = new JPanel(new SpringLayout());
+        int i = 0;
+        for (HashMap<String, Object> group : Mysql.query("SELECT * FROM groups")) {
+        	groupList.add(new JLabel((String)group.get("groupname")));
+        	JButton addMembers = new JButton("Add Members");
+        	JButton createEvent = new JButton("Create Group Event");
+        	if (((Long)group.get("groupleader")) == user.getId()) {
+        		groupList.add(addMembers);
+        		groupList.add(createEvent);
+        	} else {
+        		groupList.add(new JLabel(""));
+        		groupList.add(new JLabel(""));
+        	}
+        	i += 1;
+        }
+        SpringUtilities.makeCompactGrid(groupList, i, 3, 10, 10, 10, 10);
+        groupPanel.add(groupList);
+
+        SpringUtilities.makeCompactGrid(groupPanel, 3, 1, 10, 10, 10, 10);
         return groupPanel;
     }
+    ActionListener groupCreateAL = new ActionListener() {
+    	@Override
+    	public void actionPerformed(ActionEvent actionEvent) {
+    		JFrame mainFrame = App.getApplication().getMainFrame();
+            GroupCreateDialog groupDialog = new GroupCreateDialog(mw, mainFrame, true);
+            groupDialog.pack();
+            groupDialog.setLocationRelativeTo(null);
+            groupDialog.setBackground(Color.black); //changes bg color of login panel
+            groupDialog.setVisible(true);
+    	}
+    };
     
     public void createMenuBar() {
     	JMenu accountMenu = new JMenu("Account");

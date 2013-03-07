@@ -1,5 +1,6 @@
 package com.bravo.view;
 
+import com.bravo.model.User;
 import com.bravo.utils.*;
 
 import java.awt.Color;
@@ -10,23 +11,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 
-public class LoginDialog extends javax.swing.JDialog {
+public class GroupDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905461192089849L;
 	private MainWindow mainWindow;
-    JTextField username;
-    JPasswordField password;
+	private long userId;
+	private ArrayList<Long> groupUsers;
+	private JPanel userPanel;
+    private ArrayList<JCheckBox> userCBs;
 
-    public LoginDialog(MainWindow mw, java.awt.Frame parent, boolean modal) {
+    public GroupDialog(MainWindow mw, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         mainWindow = mw;
+        userId = mw.getUser().getId();
         initComponents();
         initMyComponents();
         KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
@@ -43,44 +49,49 @@ public class LoginDialog extends javax.swing.JDialog {
 
     private void initMyComponents() {
         this.setTitle(("Login"));
-
-        JPanel loginPanel = new JPanel(new SpringLayout());
-        username = new JTextField();
-        password = new JPasswordField();
-        JButton loginButton = new JButton("Login to System");
-        loginButton.addActionListener(loginButtonAL);
-        
-        loginPanel.add(new JLabel("Username: "));
-        loginPanel.add(username);
-        loginPanel.add(new JLabel("Password: "));
-        loginPanel.add(password);
-        loginPanel.add(loginButton);
-        
-        SpringUtilities.makeCompactGrid(loginPanel, 5, 1, 10, 10, 10, 10);
-        this.add(loginPanel);
+        userPanel = new JPanel(new SpringLayout());
+    	ArrayList<User> allUsers = new ArrayList<User>();
+    	for (HashMap<String,Object> user : Mysql.query("SELECT userId FROM users WHERE userId!='"+userId+"'")) {
+    		allUsers.add(new User(new Integer((int) user.get("userId")).longValue()));
+    	}
+    	
+    	JPanel subPanel = new JPanel(new SpringLayout());
+    	for (User user : allUsers) {
+            JCheckBox selectUser = new JCheckBox();
+    		selectUser.setName(new Long(user.getId()).toString());
+    		selectUser.setSelected(groupUsers.contains(new Long(user.getId())));
+            selectUser.addActionListener(selectUserAL);
+            userCBs.add(selectUser);
+            subPanel.add(selectUser);
+    		subPanel.add(new JLabel(user.getName()));
+    	}
+        SpringUtilities.makeCompactGrid(subPanel, allUsers.size(), 2, 10, 10, 10, 10);
+    	JScrollPane userListPanel = new JScrollPane(subPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    	
+    	userPanel.add(new JLabel("Users:"));
+    	userPanel.add(userListPanel);    	
+        SpringUtilities.makeCompactGrid(userPanel, 2, 1, 10, 10, 10, 10);
     }    
     ActionListener loginButtonAL = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
     		try {
-    			if (!username.getText().equals("") && !password.equals("")) {
-	    			ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='"+username.getText()+"'");
-	    			String encryptedPass = Utils.passEncrypt(password.getPassword());
-	    			if (userArray.size() <= 0) {
-	    				Utils.error("We couldn't find a user matching that username in our database");
-	    			} else if (!userArray.get(0).get("password").equals(encryptedPass)) {
-	    				Utils.error("Incorrect password");
-	    			} else {
-	    				mainWindow.setUser(new Integer((int) userArray.get(0).get("userId")).longValue());
-	    				dispose();
-	    			}
-    			} else {
-    				Utils.error("You didn't fill out a required field");
-    			}
+    			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();
     			Utils.error("Misc Error");
     		}
+        }
+    };
+    ActionListener selectUserAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+        	JCheckBox cb = (JCheckBox) actionEvent.getSource();
+        	if (cb.isSelected()) {
+        		groupUsers.add(Long.parseLong(cb.getName()));
+        	} else {
+        		groupUsers.remove(Long.parseLong(cb.getName()));
+        	}
         }
     };
 
