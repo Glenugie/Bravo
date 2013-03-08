@@ -15,11 +15,14 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -39,24 +42,42 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private MainWindow mainWindow;
 	private EventController eventController;
 	private User user;
-	private Image bglogo; //will store background image *Denis
+	private Image img; //will store background image 
+	//private ImageIcon imageIcon;
+	
 
 	public TimetablePanel(MainWindow mainWindow, EventController eventController) {
         super();
         
         this.mainWindow = mainWindow;
         this.eventController = eventController;
+        //this.imageIcon = Icons.getIcon("TeamLogoBG.jpg");
         this.user = mainWindow.getUser();
         
         initComponents();
         initMyComponents();
+        
     }
 
 	private void initMyComponents() {
 		if (user.getId() == -4) {
 			this.setLayout(new FlowLayout());
 			//change background color so it would display image on the background
+			/*try{
+			Image backgroundimg = ImageIO.read(new File("TeamBravoBG.jpg"));
+			paint(null);
 			
+			} catch (IOException e) {
+				System.err.println("No BG image found, continue without");
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+			GuiControl img = new GuiControl(new ImageIcon ("TeamLogoBG.jpg").getImage());
+			JFrame frame = new JFrame();
+			frame.getContentPane().add(img);
+			frame.pack();
+			frame.setVisible(true); //not working properly yet, will fix it soon
+		
 			this.add(new JLabel("You need to log in to view a timetable"));
 		} else {
 			this.setLayout(new BorderLayout());
@@ -153,15 +174,8 @@ public class TimetablePanel extends javax.swing.JPanel {
 		b.addActionListener(eventButtonAL);
 		timetable.add(b, c);
 	}
-	public void getImage (){   //for backgorund logo *Denis
-		ImageIcon icon = new ImageIcon ("BravoLogo.jpg");
-		bglogo =icon.getImage();
-		
-	}
-	public void paint (Graphics g){  //paint bglogo
-		g.drawImage(bglogo,0,0,getSize().width,getSize().height,this);
-		super.paint(g);
-	}
+	
+	
 
 	/**
 	 * This method is called from within the constructor to initialize the form.
