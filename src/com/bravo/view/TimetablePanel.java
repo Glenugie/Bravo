@@ -43,7 +43,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private EventController eventController;
 	private User user;
 	private Image img; //will store background image 
-	//private ImageIcon imageIcon;
+	
 	
 
 	public TimetablePanel(MainWindow mainWindow, EventController eventController) {
@@ -51,7 +51,7 @@ public class TimetablePanel extends javax.swing.JPanel {
         
         this.mainWindow = mainWindow;
         this.eventController = eventController;
-        //this.imageIcon = Icons.getIcon("TeamLogoBG.jpg");
+        
         this.user = mainWindow.getUser();
         
         initComponents();
@@ -62,26 +62,37 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private void initMyComponents() {
 		if (user.getId() == -4) {
 			this.setLayout(new FlowLayout());
-			//change background color so it would display image on the background
-			/*try{
-			Image backgroundimg = ImageIO.read(new File("TeamBravoBG.jpg"));
-			paint(null);
 			
-			} catch (IOException e) {
-				System.err.println("No BG image found, continue without");
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			GuiControl img = new GuiControl(new ImageIcon ("TeamLogoBG.jpg").getImage());
+			/*GuiControl img = new GuiControl(new ImageIcon ("TeamLogoBG.jpg").getImage());
 			JFrame frame = new JFrame();
 			frame.getContentPane().add(img);
 			frame.pack();
+			this.setLayout(new BorderLayout());
+			this.add(frame, BorderLayout.CENTER);
 			frame.setVisible(true); //not working properly yet, will fix it soon
-		
+			this.add(frame);*/
+			
+			
+			/*Image image = GenerateImage.toImage(true);
+			ImageIcon icon = new ImageIcon("TeamBravoBG.jpg");
+			JLabel imgbg = new JLabel();
+			imgbg.setIcon(icon);*/
+			
+			ImageIcon bgicon = new ImageIcon("TeamLogoBG.jpg");
+			JLabel bgLabel = new JLabel();
+			bgLabel.setIcon(bgicon);
+			this.add(bgLabel,BorderLayout.CENTER);
+			this.setBackground(Color.WHITE);
+			
 			this.add(new JLabel("You need to log in to view a timetable"));
+			//this.add(frame, BorderLayout.CENTER);
+			
 		} else {
+			
+			
 			this.setLayout(new BorderLayout());
 			timetable = new JPanel();
+			
 			timetable.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
 			c.fill = GridBagConstraints.HORIZONTAL;

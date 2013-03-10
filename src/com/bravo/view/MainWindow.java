@@ -62,6 +62,7 @@ public final class MainWindow extends FrameView {
         clearOldEvents();
         update();
         mainPanel.add(tabbedPane);
+       
     }
     
     public JPanel createMapPanel() {
@@ -299,4 +300,8 @@ public final class MainWindow extends FrameView {
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
     // End of variables declaration//GEN-END:variables
+
+	
+
+	
 }
