@@ -50,7 +50,7 @@ public final class MainWindow extends FrameView {
         
         eventController = new EventController(this);
         mw = this;
-        user = new User(-4);
+        user = new User(2);
 
         initComponents();
         initMyComponents();

@@ -207,7 +207,7 @@ public class EventController {
 						startDay += 7;
 					} else if (noEvents == JOptionPane.NO_OPTION) {
 						//Redefine all slots to find best fit
-						/*=====To Write=====*/
+						return bestFitAlgorithm(eventUsers, e);
 					} else {
 						successful = true;
 					}
@@ -309,6 +309,11 @@ public class EventController {
 		}
 		
 		return returnValue;
+	}
+	
+	public String bestFitAlgorithm(ArrayList<Long> eventUsers, Event e) {
+		/*To Write*/
+		return "";
 	}
 	
     public int calcRepeating(Event e) {
