@@ -44,25 +44,43 @@ public class GroupCreateDialog extends javax.swing.JDialog {
         }
     };
     
+    public boolean groupNameCheck() {
+    	ArrayList<String> allGroups = new ArrayList<String>();
+    	for (HashMap<String,Object> group : Mysql.query("SELECT groupname FROM groups")) {
+    		allGroups.add( (String) group.get("groupname"));
+    	} 
+    	for (String i: allGroups){
+    		if (i.equals(groupName.getText())){
+    			this.setTitle(("Group Already Exists"));
+    			JButton groupOK = new JButton ("Ok");
+    			groupOK.addActionListener(groupButtonAL);
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
     private void initMyComponents() {
-        this.setTitle(("Group Create"));
-        JPanel groupPanel = new JPanel(new SpringLayout());
-        groupName = new JTextField();
-        groupPanel.add(groupName);
-        JButton groupCreate = new JButton("Create Group");
-        groupCreate.addActionListener(groupButtonAL);
-        groupPanel.add(groupCreate);
-        SpringUtilities.makeCompactGrid(groupPanel, 2, 1, 10, 10, 10, 10);
-        this.add(groupPanel);
+    	this.setTitle(("Group Create"));
+    	JPanel groupPanel = new JPanel(new SpringLayout());
+    	groupName = new JTextField();
+    	groupPanel.add(groupName);
+    	JButton groupCreate = new JButton("Create Group");
+    	groupCreate.addActionListener(groupButtonAL);
+    	groupPanel.add(groupCreate);
+    	SpringUtilities.makeCompactGrid(groupPanel, 2, 1, 10, 10, 10, 10);
+    	this.add(groupPanel);
     }    
     ActionListener groupButtonAL = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
     		try {
-    			Mysql.query("INSERT INTO groups (groupname, groupleader) VALUES ('"+groupName.getText()+"', '"+userId+"')");
-    			long groupId = (long)Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName.getText()+"'");
-    			Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+userId+"')");
+    			if (!groupNameCheck()){
+    				Mysql.query("INSERT INTO groups (groupname, groupleader) VALUES ('"+groupName.getText()+"', '"+userId+"')");
+    				long groupId = new Integer((int) Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName.getText()+"'")).longValue();
+    				Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+userId+"')");
+    				update();
+    			}
     			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();
@@ -72,6 +90,7 @@ public class GroupCreateDialog extends javax.swing.JDialog {
     };
 
     public void update() {
+    	initMyComponents();
     }
 
     /** This method is called from within the constructor to

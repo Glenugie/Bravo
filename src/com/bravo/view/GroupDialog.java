@@ -78,7 +78,7 @@ public class GroupDialog extends javax.swing.JDialog {
     	userPanel.add(new JLabel("Users:"));
     	userPanel.add(userListPanel);
     	userPanel.add(addButton);
-        SpringUtilities.makeCompactGrid(userPanel, 2, 1, 10, 10, 10, 10);
+        SpringUtilities.makeCompactGrid(userPanel, 3, 1, 10, 10, 10, 10);
         
         this.add(userPanel);
     }    
@@ -86,7 +86,10 @@ public class GroupDialog extends javax.swing.JDialog {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
     		try {
-    			//Insert Code Here to be processed on click
+    			for (int i = 0; i < groupUsers.size(); i++) {
+    				long groupId = new Integer((int) Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName+"'")).longValue();
+    				Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+groupUsers.get(i)+"')");
+    			}
     			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();

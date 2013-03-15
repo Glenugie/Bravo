@@ -43,6 +43,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private EventController eventController;
 	private User user;
 	private Image img; //will store background image 
+	private int priority; // To be used for the colour switch for eventing. *PS
 	
 	
 
@@ -85,7 +86,12 @@ public class TimetablePanel extends javax.swing.JPanel {
 			this.add(bgLabel,BorderLayout.CENTER);
 			this.setBackground(Color.WHITE);
 			
+//<<<<<<< HEAD
 			//this.add(new JLabel("You need to log in to view a timetable"), BorderLayout.PAGE_END);
+//=======
+			this.add(new JLabel("<html><center><font size=18><b>Welcome to Dynacalendar</b>"+
+					"<br>Please sign in to continue.</font></center</html>"));
+//>>>>>>> 0f12c1b92c1bf6cbedc19d96e4f94dc3f9bfc324
 			//this.add(frame, BorderLayout.CENTER);
 			
 		} else {
@@ -130,12 +136,13 @@ public class TimetablePanel extends javax.swing.JPanel {
 				int row = 0;
 				for (int i = 0; i < 1440; i += eventController.timeSlot) {
 					if (events.get(i) != null) {
+						priority = (int) timetableDay.get(row).get("priority");
 						addCell((String) timetableDay.get(row).get("name"),
 								((i / eventController.timeSlot) + 1), (day + 1), events.get(i),
-								date);
+								date, priority);
 						row += 1;
 					} else {
-						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date);
+						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, 0);
 					}
 				}
 
@@ -171,10 +178,12 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.ipady = 100;
 		JLabel l = new JLabel(s, SwingConstants.CENTER);
 		l.setBorder(LineBorder.createBlackLineBorder());
+		l.setBackground(Color.GRAY);
+		l.setOpaque(true);
 		timetable.add(l, c);
 	}
 
-	private void addCell(String s, int x, int y, int width, String date) {
+	private void addCell(String s, int x, int y, int width, String date, int priority) {
 		c.gridx = x;
 		c.gridy = y;
 		c.gridwidth = width;
@@ -184,6 +193,18 @@ public class TimetablePanel extends javax.swing.JPanel {
 		b.setBorder(LineBorder.createBlackLineBorder());
 		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date);
 		b.addActionListener(eventButtonAL);
+		
+		while (priority > 5) { priority -= 5;}
+		System.out.println(priority);
+		switch(priority) {
+			case 1: b.setBackground(Color.WHITE); break;
+			case 2: b.setBackground(new Color(191, 169, 142)); break;
+			case 3: b.setBackground(new Color(50, 140, 115)); break;
+			case 4: b.setBackground(new Color(191, 145, 59)); break; 
+			case 5: b.setBackground(new Color(166, 59, 50)); break;
+			default: b.setBackground(Color.WHITE); break; 
+		}
+		b.setOpaque(true);
 		timetable.add(b, c);
 	}
 	
