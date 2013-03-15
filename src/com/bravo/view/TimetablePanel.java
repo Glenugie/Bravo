@@ -81,10 +81,11 @@ public class TimetablePanel extends javax.swing.JPanel {
 			ImageIcon bgicon = new ImageIcon("TeamLogoBG.jpg");
 			JLabel bgLabel = new JLabel();
 			bgLabel.setIcon(bgicon);
+			
 			this.add(bgLabel,BorderLayout.CENTER);
 			this.setBackground(Color.WHITE);
 			
-			this.add(new JLabel("You need to log in to view a timetable"));
+			//this.add(new JLabel("You need to log in to view a timetable"), BorderLayout.PAGE_END);
 			//this.add(frame, BorderLayout.CENTER);
 			
 		} else {
