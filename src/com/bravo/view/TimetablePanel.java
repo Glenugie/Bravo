@@ -73,8 +73,11 @@ public class TimetablePanel extends javax.swing.JPanel {
 				e.printStackTrace();
 				}
 				*/
-		
-			
+			ImageIcon bgimage = new ImageIcon("TeamLogoBG.jpg");
+			JLabel BGlbl = new JLabel();
+			BGlbl.setIcon(bgimage);
+			BGlbl.setVisible(true);
+			this.add(BGlbl);
 			this.add(new JLabel("<html><center><font size=18><b>Welcome to Dynacalendar</b>"
 					+ "<br>Please sign in to continue.</font></center></html>"));	
 			
