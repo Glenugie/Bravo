@@ -9,12 +9,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -30,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 public class TimetablePanel extends javax.swing.JPanel {
@@ -42,64 +45,42 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private MainWindow mainWindow;
 	private EventController eventController;
 	private User user;
-	private Image img; //will store background image 
+	private Image bglogo; //will store background image *Denis
 	private int priority; // To be used for the colour switch for eventing. *PS
-	
-	
 
 	public TimetablePanel(MainWindow mainWindow, EventController eventController) {
         super();
         
         this.mainWindow = mainWindow;
         this.eventController = eventController;
-        
         this.user = mainWindow.getUser();
         
         initComponents();
         initMyComponents();
-        
     }
 
 	private void initMyComponents() {
 		if (user.getId() == -4) {
+			
 			this.setLayout(new FlowLayout());
-			
-			/*GuiControl img = new GuiControl(new ImageIcon ("TeamLogoBG.jpg").getImage());
-			JFrame frame = new JFrame();
-			frame.getContentPane().add(img);
-			frame.pack();
-			this.setLayout(new BorderLayout());
-			this.add(frame, BorderLayout.CENTER);
-			frame.setVisible(true); //not working properly yet, will fix it soon
-			this.add(frame);*/
-			
-			
-			/*Image image = GenerateImage.toImage(true);
-			ImageIcon icon = new ImageIcon("TeamBravoBG.jpg");
-			JLabel imgbg = new JLabel();
-			imgbg.setIcon(icon);*/
-			
-			ImageIcon bgicon = new ImageIcon("TeamLogoBG.jpg");
-			JLabel bgLabel = new JLabel();
-			bgLabel.setIcon(bgicon);
-			
-			this.add(bgLabel,BorderLayout.CENTER);
 			this.setBackground(Color.WHITE);
+			/*
+			 * try {
+			BufferedImage img = ImageIO.read(new File("TeamLogoBG.jpg"));
+			ImageIcon icon = new ImageIcon(img);
+			JLabel label = new JLabel(icon);
+			} catch (IOException e) {
+				e.printStackTrace();
+				}
+				*/
+		
 			
-//<<<<<<< HEAD
-			//this.add(new JLabel("You need to log in to view a timetable"), BorderLayout.PAGE_END);
-//=======
-			this.add(new JLabel("<html><center><font size=18><b>Welcome to Dynacalendar</b>"+
-					"<br>Please sign in to continue.</font></center</html>"));
-//>>>>>>> 0f12c1b92c1bf6cbedc19d96e4f94dc3f9bfc324
-			//this.add(frame, BorderLayout.CENTER);
+			this.add(new JLabel("<html><center><font size=18><b>Welcome to Dynacalendar</b>"
+					+ "<br>Please sign in to continue.</font></center></html>"));	
 			
 		} else {
-			
-			
 			this.setLayout(new BorderLayout());
 			timetable = new JPanel();
-			
 			timetable.setLayout(new GridBagLayout());
 			c = new GridBagConstraints();
 			c.fill = GridBagConstraints.HORIZONTAL;
@@ -120,8 +101,8 @@ public class TimetablePanel extends javax.swing.JPanel {
 				HashMap<Integer, Integer> events = new HashMap<Integer, Integer>();
 				addCell(date, 0, (day + 1));
 				for (int row = 0; row < timetableDay.size(); row += 1) {
-					String startTime = (String) timetableDay.get(row).get(
-							"start");
+					
+					String startTime = (String) timetableDay.get(row).get("start");
 					String endTime = (String) timetableDay.get(row).get("end");
 					Integer startSlot = (((Integer.parseInt(startTime
 							.substring(0, 2)) * 60) + Integer
@@ -181,6 +162,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 		l.setBackground(Color.GRAY);
 		l.setOpaque(true);
 		timetable.add(l, c);
+		
 	}
 
 	private void addCell(String s, int x, int y, int width, String date, int priority) {
@@ -189,26 +171,44 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.gridwidth = width;
 		c.ipadx = 100;
 		c.ipady = 100;
+		try{
+		UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); //CHECK FOR DIFFERENT LOOK AND FEEL
 		JButton b = new JButton(s);
 		b.setBorder(LineBorder.createBlackLineBorder());
 		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date);
 		b.addActionListener(eventButtonAL);
+		b.setOpaque(true);
+		//b.setBorderPainted(false);
 		
 		while (priority > 5) { priority -= 5;}
 		System.out.println(priority);
+		
 		switch(priority) {
-			case 1: b.setBackground(Color.WHITE); break;
-			case 2: b.setBackground(new Color(191, 169, 142)); break;
-			case 3: b.setBackground(new Color(50, 140, 115)); break;
-			case 4: b.setBackground(new Color(191, 145, 59)); break; 
-			case 5: b.setBackground(new Color(166, 59, 50)); break;
-			default: b.setBackground(Color.WHITE); break; 
+		
+		case 1: b.setBackground(Color.WHITE); break;
+		case 2: b.setBackground(new Color(191, 169, 142)); break;
+		case 3: b.setBackground(new Color(50, 140, 115)); break;
+		case 4: b.setBackground(new Color(191, 145, 59)); break; 
+		case 5: b.setBackground(new Color(166, 59, 50));break;
+		default: b.setBackground(Color.WHITE); break; 
+		
 		}
 		b.setOpaque(true);
+		//b.setVisible(true);
 		timetable.add(b, c);
+		}catch(Exception e){
+			e.printStackTrace();	
+		}
 	}
-	
-	
+	public void getImage (){  
+		ImageIcon icon = new ImageIcon ("BravoLogo.jpg");
+		bglogo =icon.getImage();
+		
+	}
+	public void paint (Graphics g){  //paint bglogo
+		g.drawImage(bglogo,0,0,getSize().width,getSize().height,this);
+		super.paint(g);
+	}
 
 	/**
 	 * This method is called from within the constructor to initialize the form.
