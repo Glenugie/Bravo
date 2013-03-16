@@ -6,11 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import com.bravo.App;
-import com.bravo.model.*;
+import com.bravo.model.Event;
+import com.bravo.model.User;
 import com.bravo.utils.Mysql;
 import com.bravo.utils.Utils;
 import com.bravo.view.EventDialog;
@@ -320,7 +320,7 @@ public class EventController {
     	int repeatCounter = 1;
     	while (e.chain != -1) {
     		repeatCounter += 1;
-    		e = new Event(e.chain);
+    		e = new Event(e.chain,user.getId());
     	}
     	return repeatCounter;
     }

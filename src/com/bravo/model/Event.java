@@ -4,7 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import com.bravo.utils.*;
+
+import com.bravo.utils.Mysql;
 
 public class Event {
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -32,8 +33,8 @@ public class Event {
 		priority = p;
 	}
 	
-	public Event(int eId) {
-		HashMap<String,Object> eventQuery = Mysql.query("SELECT * FROM timetable WHERE id='"+eId+"'").get(0);
+	public Event(int eId, long uId) {
+		HashMap<String,Object> eventQuery = Mysql.query("SELECT * FROM timetable WHERE eventId='"+eId+"' AND userId='"+uId+"'").get(0);
 		eventId = (int) eventQuery.get("eventId");
 		userId = (int) eventQuery.get("userId");
 		name = (String) eventQuery.get("name");

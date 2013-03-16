@@ -1,9 +1,5 @@
 package com.bravo.view;
 
-import com.bravo.utils.*;
-import com.bravo.controller.*;
-import com.bravo.model.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -23,7 +19,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+
 import org.jdesktop.swingx.JXDatePicker;
+
+import com.bravo.controller.EventController;
+import com.bravo.model.Event;
+import com.bravo.model.User;
+import com.bravo.utils.Mysql;
+import com.bravo.utils.SpringUtilities;
+import com.bravo.utils.Utils;
 
 public class EventDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905584352089849L;
@@ -64,6 +68,11 @@ public class EventDialog extends javax.swing.JDialog {
         this.eD = eD;
         eventUsers = new ArrayList<Long>();
 		eventUsers.add(userId);
+		if (eId != -1) { 
+			for (HashMap<String,Object> event : Mysql.query("SELECT userId FROM timetable WHERE userId!='"+userId+"' AND start='"+eS+"' AND date='"+eD+"' AND eventId='"+eId+"'")) {
+				eventUsers.add((Long) event.get(userId));
+			}
+		}
 		userCBs = new ArrayList<JCheckBox>();
 
         
@@ -95,7 +104,7 @@ public class EventDialog extends javax.swing.JDialog {
         	buttonText = "Update Event";
         	isUpdating = true;
         	currentEvent = currentEvents.get(0);
-        	currentEvent.put("repeat", ""+eventController.calcRepeating(new Event((int) currentEvent.get("eventId"))));
+        	currentEvent.put("repeat", ""+eventController.calcRepeating(new Event((int) currentEvent.get("eventId"),userId)));
         } else { 
         	buttonText = "Create Event";
         	isUpdating = false;
