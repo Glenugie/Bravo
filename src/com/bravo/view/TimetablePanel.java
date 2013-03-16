@@ -1,30 +1,20 @@
 package com.bravo.view;
 
-import com.bravo.App;
-import com.bravo.controller.*;
-import com.bravo.model.User;
-import com.bravo.utils.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,6 +24,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
+
+import com.bravo.App;
+import com.bravo.controller.EventController;
+import com.bravo.model.User;
+import com.bravo.utils.Mysql;
+import com.bravo.utils.Utils;
 
 public class TimetablePanel extends javax.swing.JPanel {
 	/**
@@ -121,12 +117,13 @@ public class TimetablePanel extends javax.swing.JPanel {
 				for (int i = 0; i < 1440; i += eventController.timeSlot) {
 					if (events.get(i) != null) {
 						priority = (int) timetableDay.get(row).get("priority");
+						int eId = (int) timetableDay.get(row).get("eventId");
 						addCell((String) timetableDay.get(row).get("name"),
 								((i / eventController.timeSlot) + 1), (day + 1), events.get(i),
-								date, priority);
+								date, eId, priority);
 						row += 1;
 					} else {
-						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, 0);
+						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
 					}
 				}
 
@@ -146,7 +143,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 			JButton source = (JButton) actionEvent.getSource();
 			String[] name = source.getName().split(",");
 			JFrame mainFrame = App.getApplication().getMainFrame();
-			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), name[0], name[1],-1);
+			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), name[0], name[1], Integer.parseInt(name[2]));
 			eventDialog.pack();
 			eventDialog.setLocationRelativeTo(null);
 			eventDialog.setSize(new Dimension(600, 400));
@@ -168,7 +165,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 		
 	}
 
-	private void addCell(String s, int x, int y, int width, String date, int priority) {
+	private void addCell(String s, int x, int y, int width, String date, int eId, int priority) {
 		c.gridx = x;
 		c.gridy = y;
 		c.gridwidth = width;
@@ -178,13 +175,13 @@ public class TimetablePanel extends javax.swing.JPanel {
 		UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); //CHECK FOR DIFFERENT LOOK AND FEEL
 		JButton b = new JButton(s);
 		b.setBorder(LineBorder.createBlackLineBorder());
-		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date);
+		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date + "," + eId);
 		b.addActionListener(eventButtonAL);
 		b.setOpaque(true);
 		//b.setBorderPainted(false);
 		
 		while (priority > 5) { priority -= 5;}
-		System.out.println(priority);
+		//System.out.println(priority);
 		
 		switch(priority) {
 		
