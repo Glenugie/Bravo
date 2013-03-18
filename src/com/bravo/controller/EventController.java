@@ -205,9 +205,11 @@ public class EventController {
 					int noEvents = JOptionPane.showOptionDialog(null, "There are no slots in the next week that can accommodate all attendees", "No Available Slots", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 					if (noEvents == JOptionPane.YES_OPTION) {
 						startDay += 7;
+						allSlots.add("");
+						break;
 					} else if (noEvents == JOptionPane.NO_OPTION) {
 						//Redefine all slots to find best fit
-						return bestFitAlgorithm(eventUsers, e);
+						allSlots = bestFitAlgorithm(eventUsers, e);
 					} else {
 						successful = true;
 					}
@@ -244,7 +246,7 @@ public class EventController {
 					String chosenSlot = "";
 					while (!agrees) {
 						//Select slot which is closest to 2PM (Later this can be middle of working day)
-						String startSlot = chosenDate+" 14:00",slotUp = startSlot, slotDown = startSlot;
+						String startSlot = chosenDate+" 14:00", slotUp = startSlot, slotDown = startSlot;
 						boolean slotFound = false;
 						if (availableSlots.contains(startSlot)) { 
 							chosenSlot = startSlot;
@@ -311,9 +313,12 @@ public class EventController {
 		return returnValue;
 	}
 	
-	public String bestFitAlgorithm(ArrayList<Long> eventUsers, Event e) {
+	public ArrayList<String> bestFitAlgorithm(ArrayList<Long> eventUsers, Event e) {
+		ArrayList<String> allSlots = new ArrayList<String>();
+		
 		/*To Write*/
-		return "";
+		
+		return allSlots;
 	}
 	
     public int calcRepeating(Event e) {

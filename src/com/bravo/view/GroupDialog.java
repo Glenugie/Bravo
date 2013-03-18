@@ -25,6 +25,7 @@ public class GroupDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905461192089849L;
 	private MainWindow mainWindow;
 	private String groupName;
+	private long groupId;
 	private long userId;
 	private ArrayList<Long> groupUsers;
 	private JPanel userPanel;
@@ -35,6 +36,10 @@ public class GroupDialog extends javax.swing.JDialog {
         mainWindow = mw;
         groupName = gN;
         groupUsers = new ArrayList<Long>();
+        groupId = new Integer((int)Mysql.queryTerm("groupId","groups","WHERE groupname='"+gN+"'")).longValue();
+        for (HashMap<String,Object> member : Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'")) {
+        	groupUsers.add(new Integer((int) member.get("userId")).longValue());
+        }
         userCBs = new ArrayList<JCheckBox>();
         userId = mw.getUser().getId();
         initComponents();
@@ -90,6 +95,7 @@ public class GroupDialog extends javax.swing.JDialog {
     				long groupId = new Integer((int) Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName+"'")).longValue();
     				Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+groupUsers.get(i)+"')");
     			}
+    			mainWindow.update();
     			dispose();
     		} catch (Exception e) {
     			e.printStackTrace();

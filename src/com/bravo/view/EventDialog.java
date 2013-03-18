@@ -70,7 +70,6 @@ public class EventDialog extends javax.swing.JDialog {
 		eventUsers.add(userId);
 		if (eId != -1) { 
 			for (HashMap<String,Object> event : Mysql.query("SELECT userId FROM timetable WHERE userId!='"+userId+"' AND start='"+this.eS+"' AND date='"+this.eD+"' AND eventId='"+this.eId+"'")) {
-				System.out.println("Found "+event.get("userId"));
 				eventUsers.add(new Integer((int)event.get("userId")).longValue());
 			}
 		}
