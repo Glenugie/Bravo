@@ -326,41 +326,24 @@ public class EventController {
 			for (int time = 0; time < 1440; time += timeSlot) {
 				String slotToAdd = date+" "+Utils.minToTime(time);
 				if ((date.equals(currentDate) && time > currentMinute) || !date.equals(currentDate)) {
-					boolean slotFree = false;
-					int counter = 0;
-
-					//Slot is not filled by others
-					if (Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time)+"'").size() < eventUsers.size()) {
-						//Slot is large enough for the event
-						
-						
-						/*int timeSlots = (Utils.timeToMin(e.end) - Utils.timeToMin(e.start))/timeSlot;
-						ArrayList<String> removeSlots = new ArrayList<String>();
-						for (int i = 0; i < (allSlots.size()-3); i += 1) {
+					int attendeeNumber = 0;
+					if (Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time)+"'").size() < eventUsers.size() && Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start<='"+Utils.minToTime(time)+"' AND end>='"+Utils.minToTime(time)+"'").size() < eventUsers.size()) { //Slot is not overlapped by others
+						for (Long user : eventUsers) {
+							int timeSlots = (Utils.timeToMin(e.end) - Utils.timeToMin(e.start))/timeSlot;
 							int consecutiveSlots = 0;
 							for (int j = 0; j <= timeSlots; j += 1) {
-								//Line below is broken, null pointer
-								if (Utils.minToTime(Utils.timeToMin(allSlots.get(i).split(" ")[3])+(timeSlot*j)).equals(allSlots.get(i+j).split(" ")[3])) {
+								if (Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0 && Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start<='"+Utils.minToTime(time+(timeSlots*j))+"' AND end>='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0) { //Slot is large enough for the event
 									consecutiveSlots += 1;
 								}
 							}
-							if (consecutiveSlots == timeSlots) {
-								removeSlots.add(allSlots.get(i));
+							if (consecutiveSlots >= timeSlots) {
+								attendeeNumber += 1;
 							}
 						}
-						for (String rS : removeSlots) {
-							allSlots.remove(rS);
-						}*/
-					}
-					
-					if (slotFree) {
-						int attendeeNumber = Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time)+"'").size();
-						
-						//Store a key-value pair {Slot Name:Number of Attendees}
-						allSlots.put(slotToAdd,attendeeNumber);
-						
-						//Store the number of attendees in a no-duplicate list
-						if (!attendeeNumbers.contains(attendeeNumber)) { attendeeNumbers.add(attendeeNumber);}
+						if (attendeeNumber >= 1) {
+							allSlots.put(slotToAdd,attendeeNumber); //Store a key-value pair {Slot Name:Number of Attendees}
+							if (!attendeeNumbers.contains(attendeeNumber)) { attendeeNumbers.add(attendeeNumber);} //Store the number of attendees in a no-duplicate list
+						}
 					}
 				}
 			}
