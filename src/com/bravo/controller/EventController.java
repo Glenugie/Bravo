@@ -184,7 +184,22 @@ public class EventController {
 			}
 
 			boolean newDate = true;
-			while (newDate && allDates.size() > 0) {
+			while (newDate && allDates.size() > 0) {			
+				//No available slots, get action choice from user
+				if (allSlots.size() == 0) {
+					Object[] options = {"Check next 7 days", "Find Best Fit", "Cancel Scheduling"};
+					int noEvents = JOptionPane.showOptionDialog(null, "There are no slots in the next week that can accommodate all attendees", "No Available Slots", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+					if (noEvents == JOptionPane.YES_OPTION) {
+						startDay += 7;
+						allSlots.add("");
+						break;
+					} else if (noEvents == JOptionPane.NO_OPTION) {
+						allSlots = bestFitAlgorithm(eventUsers, e);
+					} else {
+						successful = true;
+					}
+				}
+
 				//Choose a date for the event
 				String chosenDate = "";
 				int lastCounter = (((24*60)/timeSlot)*eventUsers.size())+1;
@@ -198,22 +213,6 @@ public class EventController {
 					lastCounter = counter;
 				}
 				newDate = false;
-				
-				//No available slots, get action choice from user
-				if (allSlots.size() == 0) {
-					Object[] options = {"Check next 7 days", "Find Best Fit", "Cancel Scheduling"};
-					int noEvents = JOptionPane.showOptionDialog(null, "There are no slots in the next week that can accommodate all attendees", "No Available Slots", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-					if (noEvents == JOptionPane.YES_OPTION) {
-						startDay += 7;
-						allSlots.add("");
-						break;
-					} else if (noEvents == JOptionPane.NO_OPTION) {
-						//Redefine all slots to find best fit
-						allSlots = bestFitAlgorithm(eventUsers, e);
-					} else {
-						successful = true;
-					}
-				}
 				
 				//If there are available slots
 				if (allSlots.size() > 0) {
@@ -241,7 +240,7 @@ public class EventController {
 							}
 						}
 					}
-	
+
 					boolean agrees = false;
 					String chosenSlot = "";
 					while (!agrees) {
@@ -316,8 +315,23 @@ public class EventController {
 	public ArrayList<String> bestFitAlgorithm(ArrayList<Long> eventUsers, Event e) {
 		ArrayList<String> allSlots = new ArrayList<String>();
 		
-		/*To Write*/
+		/*
+		Create list of all slots
+		For each slot
+			If slot can hold the event:
+				- Slot is not filled by others
+				- Slot is large enough for the event
+			Then:
+				Store a key-value pair {Slot Name:Number of Attendees}
+				Store the number of attendees in a no-duplicate list
+		Sort attendee count list
+
+		Let x be the first value in the above list
+		Construct a new list containing all events with X attendees
+		Return the above list
+		*/
 		
+		//Returned array should contain all events which x users can attend, where x is the highest number possible
 		return allSlots;
 	}
 	
