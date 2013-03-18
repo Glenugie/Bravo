@@ -3,6 +3,7 @@ package com.bravo.controller;
 import java.awt.Dimension;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -194,7 +195,7 @@ public class EventController {
 						allSlots.add("");
 						break;
 					} else if (noEvents == JOptionPane.NO_OPTION) {
-						allSlots = bestFitAlgorithm(eventUsers, e);
+						allSlots = bestFitAlgorithm(eventUsers, e, startDay);
 					} else {
 						successful = true;
 					}
@@ -312,27 +313,46 @@ public class EventController {
 		return returnValue;
 	}
 	
-	public ArrayList<String> bestFitAlgorithm(ArrayList<Long> eventUsers, Event e) {
-		ArrayList<String> allSlots = new ArrayList<String>();
+	public ArrayList<String> bestFitAlgorithm(ArrayList<Long> eventUsers, Event e, int startDay) {
+		int currentMinute = Utils.timeToMin(timestamp.format(new Date().getTime()));
+		String currentDate = dateFormat.format(new Date().getTime());
+		String date = dateFormat.format(e.date.getTime() + (86400000 * startDay));
 		
-		/*
-		Create list of all slots
-		For each slot
-			If slot can hold the event:
-				- Slot is not filled by others
-				- Slot is large enough for the event
-			Then:
-				Store a key-value pair {Slot Name:Number of Attendees}
-				Store the number of attendees in a no-duplicate list
-		Sort attendee count list
-
-		Let x be the first value in the above list
-		Construct a new list containing all events with X attendees
-		Return the above list
-		*/
+		HashMap<String,Integer> allSlots = new HashMap<String,Integer>();
+		ArrayList<Integer> attendeeNumbers = new ArrayList<Integer>();
 		
-		//Returned array should contain all events which x users can attend, where x is the highest number possible
-		return allSlots;
+		//Create list of all slots
+		for (int day = startDay; day < (startDay+7); day += 1) {
+			for (int i = 0; i < 1440; i += timeSlot) {
+				String slotToAdd = date+" "+Utils.minToTime(i);
+				if ((date.equals(currentDate) && i > currentMinute) || !date.equals(currentDate)) {
+					//If slot can hold the event for at least one user:
+						//Slot is not filled by others
+						//Slot is large enough for the event
+					//Then
+						int attendeeNumber = 0;
+						//Store a key-value pair {Slot Name:Number of Attendees}
+						allSlots.put(slotToAdd,attendeeNumber);
+						//Store the number of attendees in a no-duplicate list
+						if (!attendeeNumbers.contains(attendeeNumber)) { attendeeNumbers.add(attendeeNumber);}
+				}
+			}
+			date = dateFormat.format(e.date.getTime() + (86400000 * (day + 1)));
+		}
+		
+		//Sort attendee count list
+		Integer[] attendees = (Integer[]) attendeeNumbers.toArray();
+		Arrays.sort(attendees);
+		
+		//Construct a new list containing all events with highest attendees
+		ArrayList<String> returnArray = new ArrayList<String>();
+		for (String slot : allSlots.keySet()) {
+			if (allSlots.get(slot) == attendees[0]) {
+				returnArray.add(slot);
+			}
+		}
+		
+		return returnArray;
 	}
 	
     public int calcRepeating(Event e) {
