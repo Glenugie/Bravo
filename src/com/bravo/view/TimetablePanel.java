@@ -172,7 +172,12 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.ipadx = 100;
 		c.ipady = 100;
 		try{
-		UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); //CHECK FOR DIFFERENT LOOK AND FEEL
+			String osName = System.getProperty("os.name").toLowerCase();
+			if (!osName.contains("mac"))
+			{
+				UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); //CHECK FOR DIFFERENT LOOK AND FEEL
+			}
+		
 		JButton b = new JButton(s);
 		b.setBorder(LineBorder.createBlackLineBorder());
 		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date + "," + eId);
