@@ -19,9 +19,12 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
@@ -133,7 +136,12 @@ public final class MainWindow extends FrameView {
     };
     
     public void createMenuBar() {
+    	 
+    	//UIManager.put("logoutMenuItem.selectionBackground", new Color(199,66,35)); change color of Jmenu when you drag mouse over it, Doesn't work
     	JMenu accountMenu = new JMenu("Account");
+    	JMenu TimetableView = new JMenu("Timetable View");
+    	//TimetableView.setLocation(p);
+    	
     		if (user.getId() == -4) {
 		    	JMenuItem loginMenuItem = new JMenuItem("Login");
 		    		loginMenuItem.addActionListener(loginMenuItemAL);
@@ -142,11 +150,30 @@ public final class MainWindow extends FrameView {
 		    		registerMenuItem.addActionListener(registerMenuItemAL);
 		    		accountMenu.add(registerMenuItem);
     		} else {
+    			JMenuItem ProfileMenuItem = new JMenuItem("Profile");
+	    		accountMenu.add(ProfileMenuItem);
+	    		
     			JMenuItem logoutMenuItem = new JMenuItem("Logout");
+    			logoutMenuItem.setForeground(new Color(199,66,35));	
+    			
+    			JRadioButton MonthView = new JRadioButton ("Month View");
+    			TimetableView.add(MonthView);
+    			JRadioButton WeekView = new JRadioButton ("Week View");
+    			TimetableView.add(WeekView);
+    			JRadioButton DayView = new JRadioButton("Day View");
+    			TimetableView.add(DayView);
+    			
+    			
+    				
+    				
+    				//UIManager.put("logoutMenuItem.selectionBackground", new Color(199,66,35));
     				logoutMenuItem.addActionListener(logoutMenuItemAL);
 	    			accountMenu.add(logoutMenuItem);
+	    		
     		}
+    		
     	menuBar.add(accountMenu);
+    	menuBar.add(TimetableView);
     }
     ActionListener loginMenuItemAL = new ActionListener() {
         @Override
