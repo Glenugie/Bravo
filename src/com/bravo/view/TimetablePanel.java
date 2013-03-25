@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -158,8 +159,9 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.ipadx = 100;
 		c.ipady = 100;
 		JLabel l = new JLabel(s, SwingConstants.CENTER);
+		l.setFont(new Font("Serif", Font.BOLD,16));
 		l.setBorder(LineBorder.createBlackLineBorder());
-		l.setBackground(Color.GRAY);
+		l.setBackground(new Color(173,180,196));
 		l.setOpaque(true);
 		timetable.add(l, c);
 		
@@ -175,8 +177,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 			String osName = System.getProperty("os.name").toLowerCase();
 			if (!osName.contains("mac"))
 			{
+				
 				UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() ); //CHECK FOR DIFFERENT LOOK AND FEEL
 			}
+				
 		
 		JButton b = new JButton(s);
 		b.setBorder(LineBorder.createBlackLineBorder());
@@ -200,6 +204,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 		}
 		b.setOpaque(true);
 		//b.setVisible(true);
+		b.setFont(new Font("Serif",Font.BOLD,18));
 		timetable.add(b, c);
 		}catch(Exception e){
 			e.printStackTrace();	
