@@ -88,6 +88,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 			addCell("Date", 0, 0);
 			for (int i = 0; i < 1440; i += eventController.timeSlot) {
 				String time = Utils.minToTime(i);
+				System.out.println(time);
 				addCell(time, (i / eventController.timeSlot) + 1, 0);
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -106,10 +107,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 					String endTime = (String) timetableDay.get(row).get("end");
 					Integer startSlot = (((Integer.parseInt(startTime
 							.substring(0, 2)) * 60) + Integer
-							.parseInt(startTime.substring(3, 5))) / 15) + 1;
+							.parseInt(startTime.substring(3, 5)))/15) + 1; //Remove devision by 15
 					Integer endSlot = (((Integer.parseInt(endTime.substring(0,
 							2)) * 60) + Integer.parseInt(endTime
-							.substring(3, 5))) / 15) + 1;
+							.substring(3, 5)))/15) + 1; //remove devision by 15
 					events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot
 							- startSlot);
 				}
@@ -124,12 +125,13 @@ public class TimetablePanel extends javax.swing.JPanel {
 								date, eId, priority);
 						row += 1;
 					} else {
-						addCell("+", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
+						addCell("  ", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
 					}
 				}
 
 				date = dateFormat.format((new Date().getTime())
 						+ (86400000 * (day + 1)));
+				//System.out.println(date);
 			}
 			JScrollPane scrollPane = new JScrollPane(timetable,
 					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -156,10 +158,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private void addCell(String s, int x, int y) {
 		c.gridx = x;
 		c.gridy = y;
-		c.ipadx = 100;
-		c.ipady = 100;
+		c.ipadx = 50;
+		c.ipady = 50;
 		JLabel l = new JLabel(s, SwingConstants.CENTER);
-		l.setFont(new Font("Serif", Font.BOLD,16));
+		l.setFont(new Font("Arial Black", Font.BOLD,18));
 		l.setBorder(LineBorder.createBlackLineBorder());
 		l.setBackground(new Color(173,180,196));
 		l.setOpaque(true);
@@ -171,8 +173,8 @@ public class TimetablePanel extends javax.swing.JPanel {
 		c.gridx = x;
 		c.gridy = y;
 		c.gridwidth = width;
-		c.ipadx = 100;
-		c.ipady = 100;
+		c.ipadx = 50;
+		c.ipady = 50;
 		try{
 			String osName = System.getProperty("os.name").toLowerCase();
 			if (!osName.contains("mac"))

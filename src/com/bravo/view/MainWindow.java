@@ -68,7 +68,7 @@ public final class MainWindow extends FrameView {
        
     }
     
-    public JPanel createMapPanel() {
+   public JPanel createMapPanel() {
     	mapPanel = new JPanel();
     	
     	/*URLConnection con = new URL("http://maps...").openConnection();
@@ -82,6 +82,7 @@ public final class MainWindow extends FrameView {
     	
     	return mapPanel;
     }
+
     
     public JPanel createGroupPanel() {
         groupPanel = new JPanel(new SpringLayout());
@@ -243,7 +244,7 @@ public final class MainWindow extends FrameView {
     	tabbedPane.removeAll();
     	tabbedPane.add("Timetable", new TimetablePanel(this, eventController));
     	tabbedPane.add("Group", createGroupPanel());
-        tabbedPane.addTab("Map", createMapPanel());
+    	tabbedPane.addTab("Map", createMapPanel());
         if (user.getId() == -4) { tabbedPane.setEnabledAt(1,false); tabbedPane.setEnabledAt(2,false);} else { tabbedPane.setEnabledAt(1,true); tabbedPane.setEnabledAt(2,true);}
     }
     

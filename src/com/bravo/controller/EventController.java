@@ -20,7 +20,7 @@ import com.bravo.view.MainWindow;
 public class EventController {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
     private SimpleDateFormat timestamp = new SimpleDateFormat("HH:mm");
-	public final int timeSlot = 15; // In minutes
+	public final int timeSlot = 60; // In minutes
 	public User user = new User(-4);
 	private MainWindow mainWindow;
 	private ArrayList<Integer> overwrittenEvents;
