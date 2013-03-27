@@ -152,6 +152,7 @@ public final class MainWindow extends FrameView {
 		    		accountMenu.add(registerMenuItem);
     		} else {
     			JMenuItem ProfileMenuItem = new JMenuItem("Profile");
+    			ProfileMenuItem.addActionListener(ProfileMenuItemAL);//need to add action listener
 	    		accountMenu.add(ProfileMenuItem);
 	    		
     			JMenuItem logoutMenuItem = new JMenuItem("Logout");
@@ -187,6 +188,20 @@ public final class MainWindow extends FrameView {
             loginDialog.setVisible(true);
             clearOldEvents();
         }
+    };
+    
+    
+    ActionListener ProfileMenuItemAL = new ActionListener(){
+    	@Override
+    	public void actionPerformed (ActionEvent actionEvent){
+    		JFrame mainFrame = App.getApplication().getMainFrame();
+    		ProfileDialog profileDialog = new ProfileDialog(mw,mainFrame, true);
+    		profileDialog.pack();
+    		profileDialog.setLocationRelativeTo(null);
+    		profileDialog.setSize(new Dimension(320,275));
+    		profileDialog.setVisible(true);
+    		
+    	}
     };
     ActionListener logoutMenuItemAL = new ActionListener() {
     	@Override

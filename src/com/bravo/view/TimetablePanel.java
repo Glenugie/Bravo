@@ -42,7 +42,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 	private MainWindow mainWindow;
 	private EventController eventController;
 	private User user;
-	private Image bglogo; //will store background image *Denis
+	private Image bglogo; 
 	private int priority; // To be used for the colour switch for eventing. *PS
 
 	public TimetablePanel(MainWindow mainWindow, EventController eventController) {
@@ -107,15 +107,17 @@ public class TimetablePanel extends javax.swing.JPanel {
 					String endTime = (String) timetableDay.get(row).get("end");
 					Integer startSlot = (((Integer.parseInt(startTime
 							.substring(0, 2)) * 60) + Integer
-							.parseInt(startTime.substring(3, 5)))/15) + 1; //Remove devision by 15
+							.parseInt(startTime.substring(3, 5)))/15) + 1; 
 					Integer endSlot = (((Integer.parseInt(endTime.substring(0,
 							2)) * 60) + Integer.parseInt(endTime
-							.substring(3, 5)))/15) + 1; //remove devision by 15
+							.substring(3, 5)))/15) + 1; 
 					events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot
 							- startSlot);
 				}
 
 				int row = 0;
+				
+				//add Image Icon to the button. ( team Logo small size)
 				for (int i = 0; i < 1440; i += eventController.timeSlot) {
 					if (events.get(i) != null) {
 						priority = (int) timetableDay.get(row).get("priority");
@@ -125,6 +127,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 								date, eId, priority);
 						row += 1;
 					} else {
+						
 						addCell("  ", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
 					}
 				}
@@ -190,6 +193,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 		b.addActionListener(eventButtonAL);
 		b.setOpaque(true);
 		//b.setBorderPainted(false);
+		ImageIcon ButtonIcon = new ImageIcon("TeamLogoBGForLogin.jpg");
+		JLabel BtnLbl = new JLabel();
+		BtnLbl.setIcon(ButtonIcon);
+		BtnLbl.setVisible(true);
 		
 		while (priority > 5) { priority -= 5;}
 		//System.out.println(priority);
@@ -201,7 +208,9 @@ public class TimetablePanel extends javax.swing.JPanel {
 		case 3: b.setBackground(new Color(50, 140, 115)); break;
 		case 4: b.setBackground(new Color(191, 145, 59)); break; 
 		case 5: b.setBackground(new Color(166, 59, 50));break;
-		default: b.setBackground(Color.WHITE); break; 
+		default: b.setBackground(Color.WHITE);
+		//b.add(BtnLbl); bad idea to add image unless seriously modified
+		break; 
 		
 		}
 		b.setOpaque(true);
