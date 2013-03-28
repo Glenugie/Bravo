@@ -72,6 +72,7 @@ public class LoginDialog extends javax.swing.JDialog {
 	    				Utils.error("Incorrect password");
 	    			} else {
 	    				mainWindow.setUser(new Integer((int) userArray.get(0).get("userId")).longValue());
+	    				
 	    				dispose();
 	    			}
     			} else {

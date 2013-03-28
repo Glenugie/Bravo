@@ -37,6 +37,7 @@ public final class MainWindow extends FrameView {
     private JTable timetable;
     private EventController eventController;
     private User user;
+    private long userID;
     private MainWindow mw;
 	
     public MainWindow(SingleFrameApplication app) {
@@ -195,7 +196,7 @@ public final class MainWindow extends FrameView {
     	@Override
     	public void actionPerformed (ActionEvent actionEvent){
     		JFrame mainFrame = App.getApplication().getMainFrame();
-    		ProfileDialog profileDialog = new ProfileDialog(mw,mainFrame, true);
+    		ProfileDialog profileDialog = new ProfileDialog(mw,mainFrame, true, userID);
     		profileDialog.pack();
     		profileDialog.setLocationRelativeTo(null);
     		profileDialog.setSize(new Dimension(320,275));
@@ -265,7 +266,9 @@ public final class MainWindow extends FrameView {
     
     public void setUser(long userId) {
     	this.user = new User(userId);
+    	this.userID = userId;
     	eventController.user = new User(userId);
+    	
     	update();
     }
     

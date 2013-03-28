@@ -88,7 +88,7 @@ public class TimetablePanel extends javax.swing.JPanel {
 			addCell("Date", 0, 0);
 			for (int i = 0; i < 1440; i += eventController.timeSlot) {
 				String time = Utils.minToTime(i);
-				System.out.println(time);
+				
 				addCell(time, (i / eventController.timeSlot) + 1, 0);
 			}
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");

@@ -1,5 +1,7 @@
 package com.bravo.view;
+import com.bravo.model.User;
 import com.bravo.utils.*;
+
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -21,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
+import com.bravo.controller.*;
 public class ProfileDialog extends javax.swing.JDialog{
 	private static final long serialVersionUID = 5427903396379849829L;
 	private MainWindow mainWindow;
@@ -29,9 +32,12 @@ public class ProfileDialog extends javax.swing.JDialog{
     JPasswordField newPassword;
     JTextField email;
     JTextField confirmEmail;
+    private EventController eventController;
+    long userid;
     
-    public ProfileDialog (MainWindow mw,java.awt.Frame parent, boolean modal ){
+    public ProfileDialog (MainWindow mw,java.awt.Frame parent, boolean modal, long userID){
     	super(parent, modal);
+    	this.userid=userID;
         mainWindow = mw;
         initComponents();
         initMyComponents();
@@ -49,15 +55,26 @@ public class ProfileDialog extends javax.swing.JDialog{
     public void initMyComponents(){
     	this.setTitle("Profile");
     	
-    	JPanel ProfilePanel = new JPanel (new GridLayout(7,7));
+    	JPanel ProfilePanel = new JPanel (new GridLayout(8,7));
     	
     	username=new JTextField(10);
     	username.setEditable(false);
-    	ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='"+username.getText()+"'");    	
-    	username.setText(username.getText()+ "," + userArray);
+    	/*User user=mainWindow.getUser();
+    	username.setText(user.toString());*/
+    	//ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='"+username.getText()+"'");    	
+    	//username.setText(user.getText()+ "," + user);
+    	/*String user = User.class.getName();
+    	username.setText(user);
+    	System.out.println(user);*/
+    	//username.setText(String.valueOf(userid)); Just for testing that correct user ID is displayed
+    	//ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT username FROM users WHERE userId='"+String.valueOf(userid)+"'");
+    	User user = new User(userid);
+    	
+    	username.setText(user.getName());
     	password = new JPasswordField();
     	newPassword = new JPasswordField();
     	email= new JTextField();
+    	email.setText(user.getEmail());
     	
     	JButton UpdateProfile = new JButton("Update Profile");
     	//UpdateProfile.addActionListener(UpdateProfileAL);

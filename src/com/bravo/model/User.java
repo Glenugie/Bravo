@@ -1,4 +1,4 @@
-package com.bravo.model;
+ package com.bravo.model;
 
 import com.bravo.utils.*;
 
