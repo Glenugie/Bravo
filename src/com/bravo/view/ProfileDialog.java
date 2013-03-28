@@ -1,10 +1,15 @@
 package com.bravo.view;
 import com.bravo.utils.*;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JButton;
@@ -15,12 +20,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+import javax.swing.border.EmptyBorder;
 public class ProfileDialog extends javax.swing.JDialog{
 	private static final long serialVersionUID = 5427903396379849829L;
 	private MainWindow mainWindow;
     JTextField username;
     JPasswordField password;
-    JPasswordField confirmPassword;
+    JPasswordField newPassword;
     JTextField email;
     JTextField confirmEmail;
     
@@ -43,24 +49,32 @@ public class ProfileDialog extends javax.swing.JDialog{
     public void initMyComponents(){
     	this.setTitle("Profile");
     	
-    	JPanel ProfilePanel = new JPanel ();
-    	username=new JTextField();
+    	JPanel ProfilePanel = new JPanel (new GridLayout(7,7));
+    	
+    	username=new JTextField(10);
+    	username.setEditable(false);
+    	ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='"+username.getText()+"'");    	
+    	username.setText(username.getText()+ "," + userArray);
     	password = new JPasswordField();
-    	confirmPassword = new JPasswordField();
+    	newPassword = new JPasswordField();
     	email= new JTextField();
+    	
     	JButton UpdateProfile = new JButton("Update Profile");
     	//UpdateProfile.addActionListener(UpdateProfileAL);
     	
     	
     	ProfilePanel.add(new JLabel("Username: "));
     	ProfilePanel.add(username);
+    	this.add(ProfilePanel);
+    	
+       
     	ProfilePanel.add(new JLabel("Existing password: "));
     	ProfilePanel.add(password);
     	ProfilePanel.add(new JLabel("New password: "));
+    	ProfilePanel.add(newPassword);
     	ProfilePanel.add(new JLabel("Email"));
     	ProfilePanel.add(email);
-    	SpringUtilities.makeCompactGrid(ProfilePanel, 5, 2, 10, 10, 10, 10);
-        this.add(ProfilePanel);
+    	//SpringUtilities.makeCompactGrid(ProfilePanel, 5, 2, 10, 10, 10, 10);
         
         JPanel ProfileButton = new JPanel();
         ProfileButton.add(UpdateProfile);
