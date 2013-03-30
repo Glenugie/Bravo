@@ -77,7 +77,7 @@ public class ProfileDialog extends javax.swing.JDialog{
     	email.setText(user.getEmail());
     	
     	JButton UpdateProfile = new JButton("Update Profile");
-    	//UpdateProfile.addActionListener(UpdateProfileAL);
+    	UpdateProfile.addActionListener(UpdateProfileAL);
     	
     	
     	ProfilePanel.add(new JLabel("Username: "));
@@ -100,17 +100,35 @@ public class ProfileDialog extends javax.swing.JDialog{
         
     	
     }
-   /* ActionListener UpdateProfileAL = new ActionListener(){
+    ActionListener UpdateProfileAL = new ActionListener(){
     	@Override
     	public void actionPerformed (ActionEvent actionEvent){
-    		
+    		try{
+    			if(!username.getText().equals("") &&!password.equals("")){
+    				ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='" + username.getText() + "'");
+    				String encryptedPass = Utils.passEncrypt(password.getPassword());
+    				if (!userArray.get(0).get("password").equals(encryptedPass)) {
+	    				Utils.error("Incorrect password");
+    			}else if (password.getText() != newPassword.getText()){
+	    					Utils.error ("Existing password and new password doesn't match");
+	    				}else{
+	    					Utils.confirm("Confirm the Update");
+	    					
+    				}
+    			}
+    		}catch (Exception e) {
+    			e.printStackTrace();
+    			Utils.error("Misc Error");
+    		}
     	}
+    		
+    	};
     
     
     	
     
-    };
-	*/
+    
+	
 
     public void update() {
     }
