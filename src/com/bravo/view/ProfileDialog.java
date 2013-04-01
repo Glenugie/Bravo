@@ -109,11 +109,21 @@ public class ProfileDialog extends javax.swing.JDialog{
     				String encryptedPass = Utils.passEncrypt(password.getPassword());
     				if (!userArray.get(0).get("password").equals(encryptedPass)) {
 	    				Utils.error("Incorrect password");
-    			}else if (password.getText() != newPassword.getText()){
-	    					Utils.error ("Existing password and new password doesn't match");
-	    				}else{
-	    					Utils.confirm("Confirm the Update");
+    			}else if (password.getText().equals( newPassword.getText())){
+	    					Utils.error ("New password is the same as old password");
+	    				}else if(!email.getText().contains("@")){
+	    					Utils.error("Enter valid email address");
 	    					
+    				}else{
+    					if (Utils.confirm("Confirm Update")){{ 
+    						//Mysql.query("UPDATE users (username, password, email)SET VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(newPassword.getPassword())+"', '"+email.getText()+"')WHERE username='" +username.getText()+"')");
+    						Mysql.query("UPDATE users SET password='"+Utils.passEncrypt(newPassword.getPassword())+"',email='"+email.getText()+"' WHERE username ='"+username.getText()+"'");
+    						
+    						dispose();
+    					}
+    					
+    					
+    					}
     				}
     			}
     		}catch (Exception e) {
