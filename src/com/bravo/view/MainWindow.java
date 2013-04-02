@@ -1,17 +1,12 @@
 package com.bravo.view;
 
-import com.bravo.controller.*;
-import com.bravo.model.User;
-import com.bravo.utils.*;
-import com.bravo.App;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,11 +18,16 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
-import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
+import org.jdesktop.application.SingleFrameApplication;
+
+import com.bravo.App;
+import com.bravo.controller.EventController;
+import com.bravo.model.User;
+import com.bravo.utils.Mysql;
+import com.bravo.utils.SpringUtilities;
+import com.bravo.utils.Utils;
 
 public final class MainWindow extends FrameView {
     private JTabbedPane tabbedPane;
@@ -54,7 +54,7 @@ public final class MainWindow extends FrameView {
         
         eventController = new EventController(this);
         mw = this;
-        user = new User(2);
+        user = new User(-4);
 
         initComponents();
         initMyComponents();

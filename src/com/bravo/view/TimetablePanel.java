@@ -107,10 +107,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 					String endTime = (String) timetableDay.get(row).get("end");
 					Integer startSlot = (((Integer.parseInt(startTime
 							.substring(0, 2)) * 60) + Integer
-							.parseInt(startTime.substring(3, 5)))/15) + 1; 
+							.parseInt(startTime.substring(3, 5)))/eventController.timeSlot) + 1; 
 					Integer endSlot = (((Integer.parseInt(endTime.substring(0,
 							2)) * 60) + Integer.parseInt(endTime
-							.substring(3, 5)))/15) + 1; 
+							.substring(3, 5)))/eventController.timeSlot) + 1; 
 					events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot
 							- startSlot);
 				}
