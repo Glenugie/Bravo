@@ -239,11 +239,11 @@ public final class MainWindow extends FrameView {
     public void clearOldEvents() {
     	//Delete all events from < Yesterday
     	if (user.getId() != -4) {
-	    	ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"'");
+	    	ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM event WHERE userId='"+user.getId()+"'");
 	    	for (int i = userEvents.size()-1; i >= 0; i -= 1) {
 	    		try {
 	    			if (Utils.parseDate((String) userEvents.get(i).get("date")).getTime() < new Date().getTime()-86400000) {
-		    			Mysql.query("DELETE FROM timetable WHERE eventId='"+userEvents.get(i).get("eventId")+"'");
+		    			Mysql.query("DELETE FROM event WHERE eventId='"+userEvents.get(i).get("eventId")+"'");
 		    			userEvents.remove(i);
 		    		}
 	    		} catch (Exception e) {

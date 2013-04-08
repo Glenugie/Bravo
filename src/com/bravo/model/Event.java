@@ -17,7 +17,7 @@ public class Event {
 	public String end;
 	public Date date;
 	public int chain;
-	public String location;
+	public int location;
 	public int priority;
 	
 	public Event(int eId, long uId, String n, String t, String s, String e, Date d, String l, int p) {
@@ -29,12 +29,12 @@ public class Event {
 		end = e;
 		date = d;
 		chain = -1;
-		location = l;
+		location = -1;
 		priority = p;
 	}
 	
 	public Event(int eId, long uId) {
-		HashMap<String,Object> eventQuery = Mysql.query("SELECT * FROM timetable WHERE eventId='"+eId+"' AND userId='"+uId+"'").get(0);
+		HashMap<String,Object> eventQuery = Mysql.query("SELECT * FROM event WHERE eventId='"+eId+"' AND userId='"+uId+"'").get(0);
 		eventId = (int) eventQuery.get("eventId");
 		userId = (int) eventQuery.get("userId");
 		name = (String) eventQuery.get("name");
@@ -46,8 +46,8 @@ public class Event {
 		} catch (ParseException e) {
 			System.err.println("Unable to parse date");
 		}
-		chain = (int) eventQuery.get("nextChain");
-		location = (String) eventQuery.get("location");
+		chain = (int) eventQuery.get("groupID");
+		location = (int) eventQuery.get("addressID");
 		priority = (int) eventQuery.get("priority");
 	}
 }

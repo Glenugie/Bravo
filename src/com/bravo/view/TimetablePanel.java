@@ -95,7 +95,10 @@ public class TimetablePanel extends javax.swing.JPanel {
 			String date = dateFormat.format(new Date().getTime());
 			for (int day = 0; day < 7; day += 1) {
 				ArrayList<HashMap<String, Object>> timetableDay = Mysql
-						.query("SELECT * FROM timetable WHERE userId='"
+						.query("SELECT * FROM event WHERE userId='"
+								+ user.getId() + "' AND date='" + date
+								+ "' ORDER BY start ASC");
+				System.out.println("SELECT * FROM event WHERE userId='"
 								+ user.getId() + "' AND date='" + date
 								+ "' ORDER BY start ASC");
 

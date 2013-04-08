@@ -53,7 +53,7 @@ public class EventController {
 			}
 			
 			if (clashFree || (!clashFree && !otherUser && !chainClash && Utils.question("This event clashes with a pre-existing event, would you like to overwrite?")) || (!clashFree && !otherUser && chainClash && Utils.question("This event chain clashes with a pre-existing event, would you like to overwrite? (You will not be able to reschedule the overwritten event)"))) {
-				int newId; try{ newId = (int)Mysql.queryTerm("id","timetable","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
+				int newId; try{ newId = (int)Mysql.queryTerm("id","event","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
 				//int oldId = newId;
 				for (int i = 0; i < eventUsers.size(); i += 1) {
 					long timeCounter = e.date.getTime();
@@ -63,11 +63,11 @@ public class EventController {
 						//if (j >= calcRepeating(e)) { isUpdating = false;}
 						if (isUpdating) {
 							newId = e.eventId;
-							Mysql.query("UPDATE timetable SET name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', " +
-								"date='"+eventParsedDate+"', location='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
+							Mysql.query("UPDATE event SET name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', " +
+								"date='"+eventParsedDate+"', addressID='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
 						} else {
-							Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority, nextChain) " +
-								"VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"', '-1')");
+							Mysql.query("INSERT INTO event (eventId, userId, name, type, start, end, date, addressID, priority) " +
+								"VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"')");
 							/*if (j != 0) {
 								int id = (int)Mysql.queryTerm("id", "timetable", "WHERE start='"+e.start+"' AND date='"+eventParsedDate+"'AND eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
 								Mysql.query("UPDATE timetable SET nextChain='"+id+"' WHERE id='"+oldId+"'");
@@ -78,7 +78,7 @@ public class EventController {
 				}
 				if (!clashFree && !chainClash && Utils.question("Do you want to reschedule the overwritten event?")) {
 					for (int i = 0; i < overwrittenEvents.size(); i += 1) { 
-						HashMap<String,Object> overwrittenEvent = Mysql.query("SELECT * FROM timetable WHERE userId='"+user.getId()+"' AND eventId='"+overwrittenEvents.get(i)+"'").get(0);
+						HashMap<String,Object> overwrittenEvent = Mysql.query("SELECT * FROM event WHERE userId='"+user.getId()+"' AND eventId='"+overwrittenEvents.get(i)+"'").get(0);
 						EventDialog eventDialog = new EventDialog(mainWindow, this, App.getApplication().getMainFrame(), true, user.getId(), ""+Utils.timeToMin((String)overwrittenEvent.get("start")), (String)overwrittenEvent.get("date"), (int)overwrittenEvent.get("eventId"));
 						eventDialog.pack();
 						eventDialog.setLocationRelativeTo(null);
@@ -86,7 +86,7 @@ public class EventController {
 						eventDialog.setVisible(true);
 					}
 				} else if (!clashFree) {
-					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM timetable WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
+					for (int i = 0; i < overwrittenEvents.size(); i += 1) { Mysql.query("DELETE FROM event WHERE eventId='"+overwrittenEvents.get(i)+"' AND userId='"+user.getId()+"'");}
 				}
 			} else {
 				if (otherUser) { Utils.error("This event clashes with an event of another user, it is recommended that you use a dynamic event when scheduling for multiple users");}
@@ -99,9 +99,9 @@ public class EventController {
 			} else {
 				String[] parsedEvent = dynamicSchedule.split(" ");
 				String parsedDate = parsedEvent[0]+" "+parsedEvent[1]+" "+parsedEvent[2];
-				int newId; try{ newId = (int)Mysql.queryTerm("id","timetable","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
+				int newId; try{ newId = (int)Mysql.queryTerm("id","event","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
 				for (int i = 0; i < eventUsers.size(); i += 1) {
-					Mysql.query("INSERT INTO timetable (eventId, userId, name, type, start, end, date, location, priority, nextChain) " + "VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+parsedEvent[3]+"', '"+parsedEvent[4]+"', '"+parsedDate+"', '"+e.location+"', '"+e.priority+"', '-1')");
+					Mysql.query("INSERT INTO event (eventId, userId, name, type, start, end, date, addressID, priority) " + "VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+parsedEvent[3]+"', '"+parsedEvent[4]+"', '"+parsedDate+"', '"+e.location+"', '"+e.priority+"')");
 				}
 			}
 		}
@@ -115,13 +115,13 @@ public class EventController {
 		for (int i = 0; i < timeSlots; i += 1) {
 			String time = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*i));
 			String endTime = Utils.minToTime(Utils.timeToMin(start) + (timeSlot*(i+1)));
-			Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND date='"+date+"' AND eventId!='"+eventId+"' AND (start='"+time+"' OR end='"+endTime+"')");
+			Object eventInSlot = Mysql.queryTerm("eventId", "event", "WHERE userId='"+userId+"' AND date='"+date+"' AND eventId!='"+eventId+"' AND (start='"+time+"' OR end='"+endTime+"')");
 			if (eventInSlot != null) {
 				if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
 				free= false;
 			}
 		}
-		Object eventInSlot = Mysql.queryTerm("eventId", "timetable", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>'"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
+		Object eventInSlot = Mysql.queryTerm("eventId", "event", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>'"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
 		if (eventInSlot != null) {
 			if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
 			free= false;
@@ -156,7 +156,7 @@ public class EventController {
 
 			//Removes slots from the list which are filled by another event
 			for (int i = 0; i < eventUsers.size(); i += 1) {
-				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date<'"+date+"'");
+				ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM event WHERE userId='"+eventUsers.get(i)+"' AND date<'"+date+"'");
 				for (HashMap<String,Object> event : userEvents) {
 					int timeSlots = (Utils.timeToMin((String)event.get("end")) - Utils.timeToMin((String)event.get("start")))/timeSlot;
 					for (int j = 0; j < timeSlots; j += 1) {
@@ -171,7 +171,7 @@ public class EventController {
 			for (int i = 0; i < (allSlots.size()-3); i += 1) {
 				int consecutiveSlots = 0;
 				for (int j = 0; j <= timeSlots; j += 1) {
-					//Line below is broken, null pointer
+					//Line below is broken, null pointer. I'd be willing to bet it was "allSlots.get(i+j)"
 					if (Utils.minToTime(Utils.timeToMin(allSlots.get(i).split(" ")[3])+(timeSlot*j)).equals(allSlots.get(i+j).split(" ")[3])) {
 						consecutiveSlots += 1;
 					}
@@ -207,7 +207,7 @@ public class EventController {
 				for (String d : allDates) {
 					int counter = 0;
 					for (int i = 0; i < eventUsers.size(); i += 1) {
-						ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+eventUsers.get(i)+"' AND date='"+d+"'");
+						ArrayList<HashMap<String,Object>> userEvents = Mysql.query("SELECT * FROM event WHERE userId='"+eventUsers.get(i)+"' AND date='"+d+"'");
 						counter += userEvents.size();
 					}
 					if (counter < lastCounter) { chosenDate = d;}
@@ -327,12 +327,12 @@ public class EventController {
 				String slotToAdd = date+" "+Utils.minToTime(time);
 				if ((date.equals(currentDate) && time > currentMinute) || !date.equals(currentDate)) {
 					int attendeeNumber = 0;
-					if (Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time)+"'").size() < eventUsers.size() && Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start<='"+Utils.minToTime(time)+"' AND end>='"+Utils.minToTime(time)+"'").size() < eventUsers.size()) { //Slot is not overlapped by others
+					if (Mysql.query("SELECT * FROM event WHERE date='"+date+"' AND start='"+Utils.minToTime(time)+"'").size() < eventUsers.size() && Mysql.query("SELECT * FROM event WHERE date='"+date+"' AND start<='"+Utils.minToTime(time)+"' AND end>='"+Utils.minToTime(time)+"'").size() < eventUsers.size()) { //Slot is not overlapped by others
 						for (Long user : eventUsers) {
 							int timeSlots = (Utils.timeToMin(e.end) - Utils.timeToMin(e.start))/timeSlot;
 							int consecutiveSlots = 0;
 							for (int j = 0; j <= timeSlots; j += 1) {
-								if (Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0 && Mysql.query("SELECT * FROM timetable WHERE date='"+date+"' AND start<='"+Utils.minToTime(time+(timeSlots*j))+"' AND end>='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0) { //Slot is large enough for the event
+								if (Mysql.query("SELECT * FROM event WHERE date='"+date+"' AND start='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0 && Mysql.query("SELECT * FROM event WHERE date='"+date+"' AND start<='"+Utils.minToTime(time+(timeSlots*j))+"' AND end>='"+Utils.minToTime(time+(timeSlots*j))+"' AND userId='"+user+"'").size() == 0) { //Slot is large enough for the event
 									consecutiveSlots += 1;
 								}
 							}

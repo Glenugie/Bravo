@@ -69,7 +69,7 @@ public class EventDialog extends javax.swing.JDialog {
         eventUsers = new ArrayList<Long>();
 		eventUsers.add(userId);
 		if (eId != -1) { 
-			for (HashMap<String,Object> event : Mysql.query("SELECT userId FROM timetable WHERE userId!='"+userId+"' AND start='"+this.eS+"' AND date='"+this.eD+"' AND eventId='"+this.eId+"'")) {
+			for (HashMap<String,Object> event : Mysql.query("SELECT userId FROM event WHERE userId!='"+userId+"' AND start='"+this.eS+"' AND date='"+this.eD+"' AND eventId='"+this.eId+"'")) {
 				eventUsers.add(new Integer((int)event.get("userId")).longValue());
 			}
 		}
@@ -95,9 +95,9 @@ public class EventDialog extends javax.swing.JDialog {
         JPanel overarchingPanel = new JPanel(new SpringLayout());
         ArrayList<HashMap<String,Object>> currentEvents;
         if (eId == -1) {
-        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
+        	currentEvents = Mysql.query("SELECT * FROM event WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"'");
         } else {
-        	currentEvents = Mysql.query("SELECT * FROM timetable WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"' AND eventId='"+eId+"'");
+        	currentEvents = Mysql.query("SELECT * FROM event WHERE userId='"+userId+"' AND start='"+eS+"' AND date='"+eD+"' AND eventId='"+eId+"'");
         }
         String buttonText = "";
         if (currentEvents.size() > 0) { 
@@ -117,7 +117,7 @@ public class EventDialog extends javax.swing.JDialog {
         	currentEvent.put("end", eE);
         	currentEvent.put("date", eD);
         	currentEvent.put("repeat", "1");
-        	currentEvent.put("location", "");
+        	currentEvent.put("addressID", "");
         	currentEvent.put("priority", "");
         }
         String[] eventTypes = {"Static", "Dynamic"};  
@@ -140,7 +140,7 @@ public class EventDialog extends javax.swing.JDialog {
     	eventRepeat = new JTextField((String) currentEvent.get("repeat"));
     	eventRepeatEdit = new JCheckBox();
     	if (!isUpdating) { eventRepeatEdit.setEnabled(false);} else { eventRepeatEdit.setSelected(true);}
-    	eventLocation = new JTextField((String) currentEvent.get("location"));
+    	eventLocation = new JTextField((String) currentEvent.get("addressID")); //Get this to grab address info
     	eventPriority = new JComboBox<String>(priorities);
     		int priority;
 	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { priority = 1;}
