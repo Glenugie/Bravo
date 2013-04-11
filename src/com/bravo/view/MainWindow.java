@@ -54,7 +54,7 @@ public final class MainWindow extends FrameView {
         
         eventController = new EventController(this);
         mw = this;
-        user = new User(-4);
+        user = new User(9);
 
         initComponents();
         initMyComponents();
@@ -256,12 +256,14 @@ public final class MainWindow extends FrameView {
     public final void update() {
     	menuBar.removeAll();
     	createMenuBar();
-    	
+    	int index = tabbedPane.getSelectedIndex();
+    	if (index == -1) { index = 0;}
     	tabbedPane.removeAll();
     	tabbedPane.add("Timetable", new TimetablePanel(this, eventController));
     	tabbedPane.add("Group", createGroupPanel());
     	tabbedPane.addTab("Map", createMapPanel());
         if (user.getId() == -4) { tabbedPane.setEnabledAt(1,false); tabbedPane.setEnabledAt(2,false);} else { tabbedPane.setEnabledAt(1,true); tabbedPane.setEnabledAt(2,true);}
+    	tabbedPane.setSelectedIndex(index);
     }
     
     public void setUser(long userId) {

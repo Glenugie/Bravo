@@ -98,9 +98,6 @@ public class TimetablePanel extends javax.swing.JPanel {
 						.query("SELECT * FROM event WHERE userId='"
 								+ user.getId() + "' AND date='" + date
 								+ "' ORDER BY start ASC");
-				System.out.println("SELECT * FROM event WHERE userId='"
-								+ user.getId() + "' AND date='" + date
-								+ "' ORDER BY start ASC");
 
 				HashMap<Integer, Integer> events = new HashMap<Integer, Integer>();
 				addCell(date, 0, (day + 1));

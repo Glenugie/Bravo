@@ -124,7 +124,7 @@ public class EventController {
 		Object eventInSlot = Mysql.queryTerm("eventId", "event", "WHERE userId='"+userId+"' AND start<='"+start+"' AND end>'"+end+"' AND date='"+date+"' AND eventId!='"+eventId+"'");
 		if (eventInSlot != null) {
 			if (userId == user.getId()) { overwrittenEvents.add((Integer)eventInSlot);}
-			free= false;
+			free = false;
 		}
 		return free;
 	}
@@ -203,6 +203,7 @@ public class EventController {
 
 				//Choose a date for the event
 				String chosenDate = "";
+				System.out.println("Getting new date");
 				int lastCounter = (((24*60)/timeSlot)*eventUsers.size())+1;
 				for (String d : allDates) {
 					int counter = 0;
@@ -213,6 +214,7 @@ public class EventController {
 					if (counter < lastCounter) { chosenDate = d;}
 					lastCounter = counter;
 				}
+				allDates.remove(chosenDate);
 				newDate = false;
 				
 				//If there are available slots
@@ -252,11 +254,13 @@ public class EventController {
 							chosenSlot = startSlot;
 							slotFound = true;
 						}
+						System.out.println(availableSlots);
 						while (!slotFound) {
 							slotUp = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotUp.split(" ")[3])+timeSlot);
 							slotDown = chosenDate+" "+Utils.minToTime(Utils.timeToMin(slotDown.split(" ")[3])-timeSlot);
 							int diffUp = Math.abs(Utils.timeToMin(slotUp.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
 							int diffDown = Math.abs(Utils.timeToMin(slotDown.split(" ")[3])-Utils.timeToMin(startSlot.split(" ")[3]));
+							//System.out.println("Slot Up: "+slotUp+" (Limit: "+(chosenDate+" "+Utils.minToTime(Utils.timeToMin("24:00")-timeSlot))+")\nSlot Down: "+slotDown+" (Limit: "+(chosenDate+" 00:00")+")");
 							if (availableSlots.contains(slotUp) && diffUp <= diffDown) {
 								slotFound = true;
 								chosenSlot = slotUp;
@@ -267,8 +271,10 @@ public class EventController {
 								slotFound = true;
 								chosenSlot = slotDown;
 							}
-							
-							if (!slotFound && (slotUp.equals(chosenDate+" 00:00") || slotDown.equals(chosenDate+" "+Utils.minToTime(Utils.timeToMin("24:00")-timeSlot)))) {
+							if (!slotFound && (slotDown.equals(chosenDate+" 00:00") || slotUp.equals(chosenDate+" "+Utils.minToTime(Utils.timeToMin("24:00")-timeSlot)))) {
+								System.out.println("Escaping");
+								slotFound = true;
+								agrees = true;
 								newDate = true;
 							}
 						}
@@ -289,11 +295,12 @@ public class EventController {
 							//If user has rejected all slots on this date, get a new one
 							if (availableSlots.size() == 0) { 
 								newDate = true;
+								agrees = true;
 							}
 						}
 					}
 					
-					if (newDate) { for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}}
+					if (newDate) { System.out.println("Removing invalid slots from allSlots");for (int i = (allSlots.size() - 1); i >= 0; i -= 1) { if (allSlots.get(i).startsWith(chosenDate)) { allSlots.remove(allSlots.get(i));}}}
 					
 					//Haven't force quit, therefore continue
 					if (!successful) {

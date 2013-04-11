@@ -1,9 +1,5 @@
 package com.bravo.view;
 
-import com.bravo.model.User;
-import com.bravo.utils.*;
-
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -15,11 +11,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+
+import com.bravo.model.User;
+import com.bravo.utils.Mysql;
+import com.bravo.utils.SpringUtilities;
+import com.bravo.utils.Utils;
 
 public class GroupDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8890905461192089849L;
@@ -37,9 +36,8 @@ public class GroupDialog extends javax.swing.JDialog {
         groupName = gN;
         groupUsers = new ArrayList<Long>();
         groupId = new Integer((int)Mysql.queryTerm("groupId","groups","WHERE groupname='"+gN+"'")).longValue();
-        for (HashMap<String,Object> member : Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'")) {
-        	groupUsers.add(new Integer((int) member.get("userId")).longValue());
-        }
+        ArrayList<HashMap<String,Object>> members = Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'");
+        for (HashMap<String,Object> member : members) { groupUsers.add(new Integer((int) member.get("userId")).longValue());}
         userCBs = new ArrayList<JCheckBox>();
         userId = mw.getUser().getId();
         initComponents();
@@ -60,9 +58,8 @@ public class GroupDialog extends javax.swing.JDialog {
         this.setTitle(("Add Members to Group"));
         userPanel = new JPanel(new SpringLayout());
     	ArrayList<User> allUsers = new ArrayList<User>();
-    	for (HashMap<String,Object> user : Mysql.query("SELECT userId FROM users WHERE userId!='"+userId+"'")) {
-    		allUsers.add(new User(new Integer((int) user.get("userId")).longValue()));
-    	}
+    	ArrayList<HashMap<String,Object>> users = Mysql.query("SELECT userId FROM users WHERE userId!='"+userId+"'");
+    	for (HashMap<String,Object> user : users) { allUsers.add(new User(new Integer((int) user.get("userId")).longValue()));}
     	
     	JPanel subPanel = new JPanel(new SpringLayout());
     	for (User user : allUsers) {
@@ -93,7 +90,13 @@ public class GroupDialog extends javax.swing.JDialog {
     		try {
     			for (int i = 0; i < groupUsers.size(); i++) {
     				long groupId = new Integer((int) Mysql.queryTerm("groupId","groups","WHERE groupname='"+groupName+"'")).longValue();
-    				Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+groupUsers.get(i)+"')");
+    				if (Mysql.query("SELECT id FROM group_members WHERE groupId='"+groupId+"' AND userId='"+groupUsers.get(i)+"'").size() == 0) {
+    					Mysql.query("INSERT INTO group_members (groupId, userId) VALUES ('"+groupId+"', '"+groupUsers.get(i)+"')");
+    				}
+    			}
+    			for (HashMap<String,Object> member : Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'")) {
+    				boolean contains = false; for (Long uId : groupUsers) { if (uId.equals(((Integer)member.get("userId")).longValue())) {  contains = true;}} 
+    				if (!contains) { Mysql.query("DELETE FROM group_members WHERE groupId='"+groupId+"' AND userId='"+member.get("userId")+"'");}
     			}
     			mainWindow.update();
     			dispose();
