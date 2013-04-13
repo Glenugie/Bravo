@@ -139,6 +139,8 @@ public class TimetablePanel extends javax.swing.JPanel {
 			JScrollPane scrollPane = new JScrollPane(timetable,
 					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 					JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+			scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
 			this.add(scrollPane, BorderLayout.CENTER);
 		}
 	}

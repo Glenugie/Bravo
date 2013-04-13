@@ -54,27 +54,21 @@ public class EventController {
 			
 			if (clashFree || (!clashFree && !otherUser && !chainClash && Utils.question("This event clashes with a pre-existing event, would you like to overwrite?")) || (!clashFree && !otherUser && chainClash && Utils.question("This event chain clashes with a pre-existing event, would you like to overwrite? (You will not be able to reschedule the overwritten event)"))) {
 				int newId; try{ newId = (int)Mysql.queryTerm("id","event","ORDER BY id DESC LIMIT 1")+1;} catch (Exception ex) { newId = 1;}
-				//int oldId = newId;
 				for (int i = 0; i < eventUsers.size(); i += 1) {
 					long timeCounter = e.date.getTime();
-					//for (int j = 0; j < chainLength; j += 1) {
-						String eventParsedDate = dateFormat.format(timeCounter);
-						timeCounter += (86400000*7);
-						//if (j >= calcRepeating(e)) { isUpdating = false;}
-						if (isUpdating) {
-							newId = e.eventId;
-							Mysql.query("UPDATE event SET name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', " +
-								"date='"+eventParsedDate+"', addressID='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
-						} else {
+					String eventParsedDate = dateFormat.format(timeCounter);
+					if (isUpdating) {
+						newId = e.eventId;
+						Mysql.query("UPDATE event SET name='"+e.name+"', type='"+e.type+"', start='"+e.start+"', end='"+e.end+"', " +
+							"date='"+eventParsedDate+"', addressID='"+e.location+"', priority='"+e.priority+"' WHERE eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
+					} else {
+						for (int j = 0; j < chainLength; j += 1) {
+							eventParsedDate = dateFormat.format(timeCounter);
 							Mysql.query("INSERT INTO event (eventId, userId, name, type, start, end, date, addressID, priority) " +
-								"VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"')");
-							/*if (j != 0) {
-								int id = (int)Mysql.queryTerm("id", "timetable", "WHERE start='"+e.start+"' AND date='"+eventParsedDate+"'AND eventId='"+newId+"' AND userId='"+eventUsers.get(i)+"'");
-								Mysql.query("UPDATE timetable SET nextChain='"+id+"' WHERE id='"+oldId+"'");
-								oldId = id;
-							}*/
+							"VALUES ('"+newId+"', '"+eventUsers.get(i)+"', '"+e.name+"', '"+e.type+"', '"+e.start+"', '"+e.end+"', '"+eventParsedDate+"', '"+e.location+"', '"+e.priority+"')");
+							timeCounter += (86400000*7);
 						}
-					//}
+					}
 				}
 				if (!clashFree && !chainClash && Utils.question("Do you want to reschedule the overwritten event?")) {
 					for (int i = 0; i < overwrittenEvents.size(); i += 1) { 
