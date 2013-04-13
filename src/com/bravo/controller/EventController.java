@@ -32,7 +32,7 @@ public class EventController {
 	public boolean addEvent(Event e, int chainLength, ArrayList<Long> eventUsers, boolean isUpdating, boolean repeatEdit) {
 		boolean successful = true;
 		overwrittenEvents = new ArrayList<Integer>();
-		if (isUpdating) { chainLength = calcRepeating(e);}
+		//if (isUpdating) { chainLength = calcRepeating(e);}
 		if (!repeatEdit) { chainLength = 1;}
 		
 		if (e.type.equals("Static") || (e.type.equals("Dynamic") && isUpdating)) {
@@ -372,12 +372,12 @@ public class EventController {
 		return returnArray;
 	}
 	
-    public int calcRepeating(Event e) {
+    /*public int calcRepeating(Event e) {
     	int repeatCounter = 1;
     	while (e.chain != -1) {
     		repeatCounter += 1;
     		e = new Event(e.chain,user.getId());
     	}
     	return repeatCounter;
-    }
+    }*/
 }

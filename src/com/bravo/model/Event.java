@@ -16,7 +16,6 @@ public class Event {
 	public String start;
 	public String end;
 	public Date date;
-	public int chain;
 	public int location;
 	public int priority;
 	
@@ -28,7 +27,6 @@ public class Event {
 		start = s;
 		end = e;
 		date = d;
-		chain = -1;
 		location = -1;
 		priority = p;
 	}
@@ -46,7 +44,6 @@ public class Event {
 		} catch (ParseException e) {
 			System.err.println("Unable to parse date");
 		}
-		chain = (int) eventQuery.get("groupID");
 		location = (int) eventQuery.get("addressID");
 		priority = (int) eventQuery.get("priority");
 	}

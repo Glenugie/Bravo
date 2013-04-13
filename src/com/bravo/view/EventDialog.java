@@ -51,6 +51,7 @@ public class EventDialog extends javax.swing.JDialog {
 	private JTextField eventLocation;
 	private JComboBox<String> eventPriority;
 	private JButton eventButton;
+	private JButton deleteButton;
 	private HashMap<String,Object> currentEvent;
 	private ArrayList<Long> eventUsers;
 	private JPanel userPanel;
@@ -104,7 +105,7 @@ public class EventDialog extends javax.swing.JDialog {
         	buttonText = "Update Event";
         	isUpdating = true;
         	currentEvent = currentEvents.get(0);
-        	currentEvent.put("repeat", ""+eventController.calcRepeating(new Event((int) currentEvent.get("eventId"),userId)));
+        	currentEvent.put("repeat", "1");
         } else { 
         	buttonText = "Create Event";
         	isUpdating = false;
@@ -140,7 +141,7 @@ public class EventDialog extends javax.swing.JDialog {
     	eventRepeat = new JTextField((String) currentEvent.get("repeat"));
     	eventRepeatEdit = new JCheckBox();
     	if (!isUpdating) { eventRepeatEdit.setEnabled(false);} else { eventRepeatEdit.setSelected(true);}
-    	eventLocation = new JTextField((String) currentEvent.get("addressID")); //Get this to grab address info
+    	eventLocation = new JTextField(new Integer((int) currentEvent.get("addressID")).toString()); //Get this to grab address info
     	eventPriority = new JComboBox<String>(priorities);
     		int priority;
 	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { priority = 1;}
@@ -156,6 +157,8 @@ public class EventDialog extends javax.swing.JDialog {
     		eventPriority.setSelectedItem(priorityS);
 		eventButton = new JButton(buttonText);
 			eventButton.addActionListener(eventButtonAL);
+		deleteButton = new JButton("Delete Event");
+			deleteButton.addActionListener(deleteButtonAL);
         
         JPanel eventPanel = new JPanel(new SpringLayout());
         eventPanel.add(new JLabel("Event Name:"));
@@ -185,7 +188,7 @@ public class EventDialog extends javax.swing.JDialog {
         eventPanel.add(new JLabel("Event Priority:"));
         eventPanel.add(eventPriority);
         eventPanel.add(eventButton);
-        eventPanel.add(new JLabel(""));
+       if (isUpdating) { eventPanel.add(deleteButton);} else { eventPanel.add(new JLabel(""));}
         SpringUtilities.makeCompactGrid(eventPanel, 9, 2, 10, 10, 10, 10);
         
         updateUserPanel();
@@ -230,6 +233,19 @@ public class EventDialog extends javax.swing.JDialog {
 						dispose();
 					}
 				}
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+        }
+    };
+    ActionListener deleteButtonAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+    		try {
+				int tempId; try { tempId = Integer.parseInt((String) currentEvent.get("eventId"));} catch (Exception e) { tempId = (int)currentEvent.get("eventId");}
+				Mysql.query("DELETE FROM event WHERE eventId='"+tempId+"'");
+				mainWindow.update();
+				dispose();
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
