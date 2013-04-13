@@ -282,7 +282,13 @@ public class EventController {
 						if (!newDate) {
 							//Get user to confirm slot
 							Object[] options = {"Schedule Event", "Show Next Slot", "Cancel Scheduling"};
-							int confirm = JOptionPane.showOptionDialog(null, "Slot selected: "+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+							String slotLabel = "";
+							String workHourStart = "09:00"; String workHourEnd = "17:00";
+							if (Utils.timeToMin(workHourStart) < Utils.timeToMin(chosenSlot.split(" ")[3]) || Utils.timeToMin(workHourEnd) > Utils.timeToMin(chosenSlot.split(" ")[3])) {
+								slotLabel += "Out of Hours ";
+							}
+							slotLabel += "Slot selected: ";
+							int confirm = JOptionPane.showOptionDialog(null, slotLabel+chosenSlot, "Slot Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
 							if (confirm == JOptionPane.YES_OPTION) {
 								agrees = true;
 							} else if (confirm == JOptionPane.NO_OPTION) {
