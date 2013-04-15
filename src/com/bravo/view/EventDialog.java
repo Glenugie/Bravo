@@ -141,11 +141,12 @@ public class EventDialog extends javax.swing.JDialog {
     	eventRepeat = new JTextField((String) currentEvent.get("repeat"));
     	eventRepeatEdit = new JCheckBox();
     	if (!isUpdating) { eventRepeatEdit.setEnabled(false);} else { eventRepeatEdit.setSelected(true);}
-    	eventLocation = new JTextField(new Integer((int) currentEvent.get("addressID")).toString()); //Get this to grab address info
+    	try { eventLocation = new JTextField(new Integer((int) currentEvent.get("addressID")).toString());}
+    	catch (Exception e) { eventLocation = new JTextField((String) currentEvent.get("addressID"));}//Get this to grab address info
     	eventPriority = new JComboBox<String>(priorities);
     		int priority;
-	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { priority = 1;}
-			if (currentEvent.get("type").equals("Static")) { priority -= 5;}
+	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { priority = new Integer((int) currentEvent.get("priority"));}
+	    	while (priority > 5) { priority -= 5;}
 			String priorityS = "";
 			switch (priority) {
 				case 1 : priorityS = "Lowest"; break;
@@ -188,7 +189,7 @@ public class EventDialog extends javax.swing.JDialog {
         eventPanel.add(new JLabel("Event Priority:"));
         eventPanel.add(eventPriority);
         eventPanel.add(eventButton);
-       if (isUpdating) { eventPanel.add(deleteButton);} else { eventPanel.add(new JLabel(""));}
+        if (isUpdating) { eventPanel.add(deleteButton);} else { eventPanel.add(new JLabel(""));}
         SpringUtilities.makeCompactGrid(eventPanel, 9, 2, 10, 10, 10, 10);
         
         updateUserPanel();
