@@ -145,7 +145,7 @@ public class EventDialog extends javax.swing.JDialog {
     	catch (Exception e) { eventLocation = new JTextField((String) currentEvent.get("addressID"));}//Get this to grab address info
     	eventPriority = new JComboBox<String>(priorities);
     		int priority;
-	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { priority = new Integer((int) currentEvent.get("priority"));}
+	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { try { priority = new Integer((int) currentEvent.get("priority"));} catch (Exception e2) { priority = 0;}}
 	    	while (priority > 5) { priority -= 5;}
 			String priorityS = "";
 			switch (priority) {
