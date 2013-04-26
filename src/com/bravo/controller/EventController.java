@@ -40,7 +40,7 @@ public class EventController {
     		boolean groupCheck = true;
     		Long groupId = new Integer((int)Mysql.queryTerm("groupId","groups","WHERE groupname='"+i+"'")).longValue();
     		ArrayList<HashMap<String,Object>> members = Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'");
-			if (((long) members.get(0).get("userId")) == user.getId()){	
+			if ((new Integer((int)members.get(0).get("userId")).longValue()) == user.getId()) {	
 				groupUsers = new ArrayList<Long>();
 				for (HashMap<String,Object> member : members) { groupUsers.add(new Integer((int) member.get("userId")).longValue());}
 				
