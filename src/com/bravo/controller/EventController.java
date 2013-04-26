@@ -35,8 +35,9 @@ public class EventController {
     	for (HashMap<String,Object> group : Mysql.query("SELECT groupname FROM groups")) {
     		allGroups.add( (String) group.get("groupname"));
     	} 
-    	boolean leadercheck = true;
+    	boolean leadercheck = false;
     	for (String i: allGroups) {
+    		boolean groupCheck = true;
     		Long groupId = new Integer((int)Mysql.queryTerm("groupId","groups","WHERE groupname='"+i+"'")).longValue();
     		ArrayList<HashMap<String,Object>> members = Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'");
 			if (((long) members.get(0).get("userId")) == user.getId()){	
@@ -45,10 +46,11 @@ public class EventController {
 				
 				for (long id: eventUsers) {
 					if(!groupUsers.contains(id)){
-						leadercheck = false;
+						groupCheck = false;
 					}
 				}
 			}
+			groupCheck = leadercheck;
     	}
     	return leadercheck;
     }
