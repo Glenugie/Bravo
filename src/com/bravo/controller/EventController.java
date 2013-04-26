@@ -28,12 +28,39 @@ public class EventController {
 	public EventController(MainWindow mw) {
 		mainWindow = mw;
 	}
+	
+  public boolean groupLeaderCheck(ArrayList<Long> eventUsers) {
+    	ArrayList<Long> groupUsers = new ArrayList<Long>();
+    	ArrayList<String> allGroups = new ArrayList<String>();
+    	for (HashMap<String,Object> group : Mysql.query("SELECT groupname FROM groups")) {
+    		allGroups.add( (String) group.get("groupname"));
+    	} 
+    	boolean leadercheck = true;
+    	for (String i: allGroups) {
+    		Long groupId = new Integer((int)Mysql.queryTerm("groupId","groups","WHERE groupname='"+i+"'")).longValue();
+    		ArrayList<HashMap<String,Object>> members = Mysql.query("SELECT userId FROM group_members WHERE groupID='"+groupId+"'");
+			if (((long) members.get(0).get("userId")) == user.getId()){	
+				groupUsers = new ArrayList<Long>();
+				for (HashMap<String,Object> member : members) { groupUsers.add(new Integer((int) member.get("userId")).longValue());}
+				
+				for (long id: eventUsers) {
+					if(!groupUsers.contains(id)){
+						leadercheck = false;
+					}
+				}
+			}
+    	}
+    	return leadercheck;
+    }
 
 	public boolean addEvent(Event e, int chainLength, ArrayList<Long> eventUsers, boolean isUpdating, boolean repeatEdit) {
 		boolean successful = true;
 		overwrittenEvents = new ArrayList<Integer>();
 		//if (isUpdating) { chainLength = calcRepeating(e);}
 		if (!repeatEdit) { chainLength = 1;}
+
+		boolean leadercheck = groupLeaderCheck(eventUsers);		
+		if (leadercheck) { e.priority += 10;}
 		
 		if (e.type.equals("Static") || (e.type.equals("Dynamic") && isUpdating)) {
 			boolean clashFree = true;
