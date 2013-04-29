@@ -1,13 +1,16 @@
 package com.bravo.view;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,6 +18,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SpringLayout;
@@ -69,20 +74,113 @@ public final class MainWindow extends FrameView {
        
     }
     
-   public JPanel createMapPanel() {
+    public JPanel createMapPanel() {
+  	   
     	mapPanel = new JPanel();
+    	mapPanel.setLayout(new BorderLayout());
     	
-    	/*URLConnection con = new URL("http://maps...").openConnection();
-    	InputStream is = con.getInputStream();
-    	byte bytes[] = new byte[con.getContentLength()];
-    	is.read(bytes);
-    	is.close();
-    	Toolkit tk = getToolkit();
-    	map = tk.createImage(bytes);
-    	tk.prepareImage(map, -1, -1, null);*/
+    	JPanel sm1 = new JPanel();	//small map1 	
+		//try {
+			//URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.155130,-2.108865&zoom=16&markers=size:mid|color:black|Aberdeen,+AB253UH&size=400x300&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
+	    	//ImageIcon img = new ImageIcon(link);   	
+	    	ImageIcon img = new ImageIcon("sm2.png");
+    		JLabel mml = new JLabel();	//main map panel
+	    	mml.setIcon(img);
+	    	mml.setVisible(true);
+	    	sm1.add(mml);
+		//} catch (MalformedURLException e) {
+		//	e.printStackTrace();
+		//}
+		//-------------------------------------------------------------    						
+    	JPanel sm2 = new JPanel(); 	//small map2
+		//try {
+			//URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.165736,-2.102185&zoom=16&markers=size:mid|color:black|high+street+aberdeen+uk&size=400x300&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
+	    	//ImageIcon img1 = new ImageIcon(link);   	
+	    	ImageIcon img1 = new ImageIcon("sm1.pmg");
+    		JLabel mml1 = new JLabel();	//main map panel
+	    	mml1.setIcon(img1);
+	    	mml1.setVisible(true);
+	    	sm2.add(mml1);
+		//} catch (MalformedURLException e) {
+		//	e.printStackTrace();
+		//}
+		//------------------------------------------------------------					
+    	JSplitPane smP = new JSplitPane(JSplitPane.VERTICAL_SPLIT, sm1, sm2);	//panel with small maps
+    	//smP.setResizeWeight(0.5);
+    	smP.setContinuousLayout(true);  		
+
+    	JPanel mm = new JPanel(); 	
+		//try {
+			//URL link = new URL("http://maps.google.com/maps/api/staticmap?&path=color:0x0000FF80|weight:5|aberdeen+ab253UH|aberdeen+uk+high+street&size=1280x610&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
+	    	//ImageIcon img2 = new ImageIcon(link);   	
+	    	ImageIcon img2 = new ImageIcon("mm.png");
+    		JLabel mml2 = new JLabel();	//main map panel
+	    	mml2.setIcon(img2);
+	    	mml2.setVisible(true);
+	    	mm.add(mml2);
+		//} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		//}
+
+    	JSplitPane maps = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mm , smP);	//contains 1 big map and 2 small ones
+    	maps.setResizeWeight(0.9);
     	
+    	maps.setContinuousLayout(true);
+
+     	JPanel eP = new JPanel();	//frame for event list
+     	eP.setPreferredSize(new Dimension(610, 300));
+     	eP.setLayout(new BorderLayout());
+     	
+     	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+		String date = dateFormat.format(new Date().getTime());
+		ArrayList<HashMap<String, Object>> timetableDay = Mysql
+					.query("SELECT * FROM event WHERE userId='"
+							+ user.getId() + "' AND date='" + date
+							+ "' ORDER BY start ASC");
+
+		String labels[] = new String[timetableDay.size()];
+		JButton buttons[] = new JButton[timetableDay.size()];
+		
+		JPanel butPanel = new JPanel(new SpringLayout());
+		for (int row = 0; row < timetableDay.size(); row += 1) {
+			labels[row]=((String)timetableDay.get(row).get("name"));
+			
+			JButton event = new JButton((String)timetableDay.get(row).get("name"));
+			event.setName(""+(int)timetableDay.get(row).get("id"));
+			event.addActionListener(eventButtonAL);
+			buttons[row]=(event);
+			butPanel.add(event);
+		}
+		SpringUtilities.makeCompactGrid(butPanel, timetableDay.size(), 1, 10,10,10,10  );
+		JScrollPane scrollPane = new JScrollPane(butPanel);
+        eP.add(scrollPane);
+
+        
+
+     	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, eP, maps);	//main split will contain event list and maps
+     	split.setResizeWeight(0.9);
+     	split.setContinuousLayout(true);  	     
+    	mapPanel.add(split);  			
     	return mapPanel;
+    	
+    	
     }
+    
+    ActionListener eventButtonAL = new ActionListener() {
+    	@Override
+    	public void actionPerformed(ActionEvent actionEvent) {
+    		JButton source = (JButton) actionEvent.getSource();
+    		HashMap<String, Object> event = Mysql.query("SELECT * FROM event WHERE id='"+source.getName()+"'").get(0);
+    		try {
+    				HashMap<String, Object> address = Mysql.query("SELECT * FROM address WHERE addressID='"+event.get("addressID")+"'").get(0);
+    				System.out.println(event.get("name")+ " " + address.get("city")+ " "+ address.get("street"));
+    				
+    		} catch (Exception e){
+    			//No address
+    		}		
+    	}
+    };
 
     
     public JPanel createGroupPanel() {
