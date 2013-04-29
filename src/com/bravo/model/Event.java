@@ -27,7 +27,14 @@ public class Event {
 		start = s;
 		end = e;
 		date = d;
-		location = -1;
+		//City, Street, Postcode
+		try {
+			String[] temp = l.split(",");
+			HashMap<String,Object> result = Mysql.query("INSERT INTO address (city, street, postcode) VALUES ('"+temp[0]+"', '"+temp[1]+"', '"+temp[2]+"')").get(0);
+			location = (int) result.get("addressID");
+		} catch (Exception ex) {
+			location = -1;
+		}
 		priority = p;
 	}
 	

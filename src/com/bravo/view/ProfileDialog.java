@@ -1,20 +1,13 @@
 package com.bravo.view;
-import com.bravo.model.User;
-import com.bravo.utils.*;
-
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,8 +15,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
-import javax.swing.border.EmptyBorder;
-import com.bravo.controller.*;
+
+import com.bravo.controller.EventController;
+import com.bravo.model.User;
+import com.bravo.utils.Mysql;
+import com.bravo.utils.SpringUtilities;
+import com.bravo.utils.Utils;
 public class ProfileDialog extends javax.swing.JDialog{
 	private static final long serialVersionUID = 5427903396379849829L;
 	private MainWindow mainWindow;
@@ -32,7 +29,14 @@ public class ProfileDialog extends javax.swing.JDialog{
     JPasswordField newPassword;
     JTextField email;
     JTextField confirmEmail;
+    private JComboBox<String> workDayStart;
+    private JComboBox<String> workDayEnd;
+    String wdStart;
+    String wdEnd;
+    String workDay;
     private EventController eventController;
+    String[] times = {"00:00","01:00","02:00","03:00","04:00","05:00","06:00","07:00","08:00","09:00","10:00","11:00",
+    		          "12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00"};
     long userid;
     
     public ProfileDialog (MainWindow mw,java.awt.Frame parent, boolean modal, long userID){
@@ -76,6 +80,11 @@ public class ProfileDialog extends javax.swing.JDialog{
     	email= new JTextField();
     	email.setText(user.getEmail());
     	
+    	workDayStart = new JComboBox<String>(times);
+    	workDayStart.setSelectedItem("09:00");
+    	workDayEnd = new JComboBox<String>(times);
+    	workDayEnd.setSelectedItem("17:00");
+    	
     	JButton UpdateProfile = new JButton("Update Profile");
     	UpdateProfile.addActionListener(UpdateProfileAL);
     	
@@ -89,6 +98,15 @@ public class ProfileDialog extends javax.swing.JDialog{
     	ProfilePanel.add(password);
     	ProfilePanel.add(new JLabel("New password: "));
     	ProfilePanel.add(newPassword);
+    	
+    	ProfilePanel.add(new JLabel("Set working day:"));
+     	JPanel timePanel = new JPanel(new SpringLayout());
+     	timePanel.add(workDayStart);
+     	timePanel.add(new JLabel("-"));
+     	timePanel.add(workDayEnd);
+     	SpringUtilities.makeCompactGrid(timePanel, 1, 3, 5, 5, 5, 5);
+        ProfilePanel.add(timePanel);
+        
     	ProfilePanel.add(new JLabel("Email"));
     	ProfilePanel.add(email);
     	//SpringUtilities.makeCompactGrid(ProfilePanel, 5, 2, 10, 10, 10, 10);
@@ -104,17 +122,22 @@ public class ProfileDialog extends javax.swing.JDialog{
     	@Override
     	public void actionPerformed (ActionEvent actionEvent){
     		try{
+        		wdStart =(String) workDayStart.getSelectedItem();
+        		wdEnd =(String) workDayEnd.getSelectedItem();
+        		workDay = wdStart+"-"+wdEnd;
+        		System.out.println(workDay);
     			if(!username.getText().equals("") &&!password.equals("")){
     				ArrayList<HashMap<String, Object>> userArray = Mysql.query("SELECT * FROM users WHERE username='" + username.getText() + "'");
     				String encryptedPass = Utils.passEncrypt(password.getPassword());
     				if (!userArray.get(0).get("password").equals(encryptedPass)) {
 	    				Utils.error("Incorrect password");
-    			}else if (password.getText().equals( newPassword.getText())){
+    			    }else if (password.getText().equals( newPassword.getText())){
 	    					Utils.error ("New password is the same as old password");
-	    				}else if(!email.getText().contains("@")){
+    			    }else if(!email.getText().contains("@")){
 	    					Utils.error("Enter valid email address");
-	    					
-    				}else{
+	    			}else if(Integer.parseInt(wdStart.substring(0,2))>Integer.parseInt(wdEnd.substring(0,2))){
+	    					Utils.error("The start of the working day should be earlier than the end");
+	    			}else{
     					if (Utils.confirm("Confirm Update")){{ 
     						//Mysql.query("UPDATE users (username, password, email)SET VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(newPassword.getPassword())+"', '"+email.getText()+"')WHERE username='" +username.getText()+"')");
     						Mysql.query("UPDATE users SET password='"+Utils.passEncrypt(newPassword.getPassword())+"',email='"+email.getText()+"' WHERE username ='"+username.getText()+"'");
