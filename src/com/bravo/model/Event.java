@@ -31,9 +31,11 @@ public class Event {
 		try {
 			String[] temp = l.split(",");
 			HashMap<String,Object> result = Mysql.query("INSERT INTO address (city, street, postcode) VALUES ('"+temp[0]+"', '"+temp[1]+"', '"+temp[2]+"')").get(0);
-			location = (int) result.get("addressID");
+			System.out.println(result);
+			location = new Long((long) result.get("GENERATED_KEY")).intValue();
 		} catch (Exception ex) {
 			location = -1;
+			ex.printStackTrace();
 		}
 		priority = p;
 	}

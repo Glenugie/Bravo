@@ -8,7 +8,7 @@ public class Mysql {
 	private static String proxyServer = "jdbc:mysql://127.0.0.1:3306/shiftout_cs3024b?user=shiftout_cs3024b&password=cs3024bpassword"; //Bypasses proxy when .bashrc is modified
 	private static String nonproxyServer = "jdbc:mysql://shiftout.co.uk:3306/shiftout_cs3024b?user=shiftout_cs3024b&password=cs3024bpassword"; //Gets used when no proxy is set
 	private static String localServer = "jdbc:mysql://127.0.0.1:3306/timetable?user=root&cs3024";
-	private static boolean local = false;
+	private static boolean local = true;
 	private static String server;
 	
 	public static boolean testConnection() {
@@ -54,7 +54,7 @@ public class Mysql {
 		    if (queryType.equals("SELECT")) {
 		    	resultSet = statement.executeQuery(query);
 		    } else if (queryType.equals("INSERT") || queryType.equals("UPDATE") || queryType.equals("DELETE")) {
-		    	 statement.executeUpdate(query);
+		    	 statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 		    	 resultSet = statement.getGeneratedKeys();
 		    }
 		    while (resultSet.next()) {

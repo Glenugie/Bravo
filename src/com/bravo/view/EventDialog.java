@@ -141,8 +141,14 @@ public class EventDialog extends javax.swing.JDialog {
     	eventRepeat = new JTextField((String) currentEvent.get("repeat"));
     	eventRepeatEdit = new JCheckBox();
     	if (!isUpdating) { eventRepeatEdit.setEnabled(false);} else { eventRepeatEdit.setSelected(true);}
-    	try { eventLocation = new JTextField(new Integer((int) currentEvent.get("addressID")).toString());}
-    	catch (Exception e) { eventLocation = new JTextField((String) currentEvent.get("addressID"));}//Get this to grab address info
+		try {
+			HashMap<String,Object> address = Mysql.query("SELECT * FROM address WHERE addressID='"+currentEvent.get("addressID")+"'").get(0);
+	    	String locationReform = (String)address.get("city")+","+(String)address.get("street")+","+(String)address.get("postcode");
+	    	eventLocation = new JTextField(locationReform);
+		} catch (Exception e) {
+	    	eventLocation = new JTextField();
+		}
+    	
     	eventPriority = new JComboBox<String>(priorities);
     		int priority;
 	    	try { priority = Integer.parseInt((String) currentEvent.get("priority"));} catch (Exception e) { try { priority = new Integer((int) currentEvent.get("priority"));} catch (Exception e2) { priority = 0;}}
