@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,62 +76,46 @@ public final class MainWindow extends FrameView {
        
     }
     
+    
+    JPanel sm = new JPanel(); 
+    JPanel mm = new JPanel(); 	
     public JPanel createMapPanel() {
   	   
     	mapPanel = new JPanel();
     	mapPanel.setLayout(new BorderLayout());
-    	
-    	JPanel sm1 = new JPanel();	//small map1 	
-		//try {
-			//URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.155130,-2.108865&zoom=16&markers=size:mid|color:black|Aberdeen,+AB253UH&size=400x300&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
-	    	//ImageIcon img = new ImageIcon(link);   	
-	    	ImageIcon img = new ImageIcon("sm2.png");
-    		JLabel mml = new JLabel();	//main map panel
-	    	mml.setIcon(img);
-	    	mml.setVisible(true);
-	    	sm1.add(mml);
-		//} catch (MalformedURLException e) {
-		//	e.printStackTrace();
-		//}
-		//-------------------------------------------------------------    						
-    	JPanel sm2 = new JPanel(); 	//small map2
-		//try {
-			//URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.165736,-2.102185&zoom=16&markers=size:mid|color:black|high+street+aberdeen+uk&size=400x300&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
-	    	//ImageIcon img1 = new ImageIcon(link);   	
-	    	ImageIcon img1 = new ImageIcon("sm1.pmg");
+    						
+
+		try {
+			URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.165736,-2.102185&zoom=4&markers=size:mid|color:black|high+street+aberdeen+uk&size=480x610&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
+	    	ImageIcon img1 = new ImageIcon(link);   	
     		JLabel mml1 = new JLabel();	//main map panel
 	    	mml1.setIcon(img1);
 	    	mml1.setVisible(true);
-	    	sm2.add(mml1);
-		//} catch (MalformedURLException e) {
-		//	e.printStackTrace();
-		//}
-		//------------------------------------------------------------					
-    	JSplitPane smP = new JSplitPane(JSplitPane.VERTICAL_SPLIT, sm1, sm2);	//panel with small maps
-    	//smP.setResizeWeight(0.5);
-    	smP.setContinuousLayout(true);  		
-
-    	JPanel mm = new JPanel(); 	
-		//try {
-			//URL link = new URL("http://maps.google.com/maps/api/staticmap?&path=color:0x0000FF80|weight:5|aberdeen+ab253UH|aberdeen+uk+high+street&size=1280x610&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
-	    	//ImageIcon img2 = new ImageIcon(link);   	
-	    	ImageIcon img2 = new ImageIcon("mm.png");
+	    	sm.removeAll();
+	    	sm.add(mml1);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+		//------------------------------------------------------------							
+    	
+		try {
+			URL link = new URL("http://maps.google.com/maps/api/staticmap?&center=aberdeen+ab253UH&zoom=10&size=1200x610&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
+	    	ImageIcon img2 = new ImageIcon(link);   	
     		JLabel mml2 = new JLabel();	//main map panel
 	    	mml2.setIcon(img2);
 	    	mml2.setVisible(true);
+	    	mm.removeAll();
 	    	mm.add(mml2);
-		//} catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
-
-    	JSplitPane maps = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mm , smP);	//contains 1 big map and 2 small ones
-    	maps.setResizeWeight(0.9);
-    	
+			e.printStackTrace();
+		}
+		mm.setPreferredSize(new Dimension(1200,610));
+    	JSplitPane maps = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mm , sm);	//contains 1 big map and 2 small ones
+    	maps.setResizeWeight(0.8);   	
     	maps.setContinuousLayout(true);
-
      	JPanel eP = new JPanel();	//frame for event list
-     	eP.setPreferredSize(new Dimension(610, 300));
+     	eP.setPreferredSize(new Dimension(400, 610));
      	eP.setLayout(new BorderLayout());
      	
      	SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
@@ -138,22 +124,20 @@ public final class MainWindow extends FrameView {
 					.query("SELECT * FROM event WHERE userId='"
 							+ user.getId() + "' AND date='" + date
 							+ "' ORDER BY start ASC");
-
 		String labels[] = new String[timetableDay.size()];
-		JButton buttons[] = new JButton[timetableDay.size()];
-		
+		JButton buttons[] = new JButton[timetableDay.size()];		
 		JPanel butPanel = new JPanel(new SpringLayout());
 		for (int row = 0; row < timetableDay.size(); row += 1) {
-			labels[row]=((String)timetableDay.get(row).get("name"));
-			
+			labels[row]=((String)timetableDay.get(row).get("name"));			
 			JButton event = new JButton((String)timetableDay.get(row).get("name"));
 			event.setName(""+(int)timetableDay.get(row).get("id"));
 			event.addActionListener(eventButtonAL);
 			buttons[row]=(event);
 			butPanel.add(event);
-		}
+		}		
 		SpringUtilities.makeCompactGrid(butPanel, timetableDay.size(), 1, 10,10,10,10  );
 		JScrollPane scrollPane = new JScrollPane(butPanel);
+		eP.setMinimumSize(new Dimension(300,610));
         eP.add(scrollPane);
 
         
@@ -173,8 +157,29 @@ public final class MainWindow extends FrameView {
     		JButton source = (JButton) actionEvent.getSource();
     		HashMap<String, Object> event = Mysql.query("SELECT * FROM event WHERE id='"+source.getName()+"'").get(0);
     		try {
-    				HashMap<String, Object> address = Mysql.query("SELECT * FROM address WHERE addressID='"+event.get("addressID")+"'").get(0);
+    				HashMap<String, Object> address = Mysql.query("SELECT * FROM address WHERE addressID='"+event.get("addressID")+"'").get(0);    				  				
     				System.out.println(event.get("name")+ " " + address.get("city")+ " "+ address.get("street"));
+    				sm.removeAll();
+    				mm.removeAll();
+    				System.out.println(constructURL((String)address.get("postcode"), (String)address.get("city"), (String)address.get("street"),1));
+    				try {
+    					URL link = new URL(constructURL((String)address.get("postcode"), (String)address.get("city"), (String)address.get("street"),1));
+    			    	ImageIcon img1 = new ImageIcon(link);   	
+    		    		JLabel mml1 = new JLabel();	//main map panel
+    			    	mml1.setIcon(img1);
+    			    	mml1.setVisible(true);
+    			    	sm.add(mml1);
+	
+    			    	link = new URL(constructURL((String)address.get("postcode"), (String)address.get("city"), (String)address.get("street"),0));
+    			    	ImageIcon img2 = new ImageIcon(link);   	
+    		    		JLabel mml2 = new JLabel();	
+    			    	mml2.setIcon(img2);
+    			    	mml2.setVisible(true);
+    			    	mm.add(mml2);
+    				} catch (MalformedURLException e) {
+    					// TODO Auto-generated catch block
+    					e.printStackTrace();
+    				}
     				
     		} catch (Exception e){
     			//No address
@@ -182,6 +187,22 @@ public final class MainWindow extends FrameView {
     	}
     };
 
+    /*
+     * mapType 1 - far, 0 - close
+     */
+    private String constructURL(String city, String street, String postCode, int mapType){
+    	String link;
+    	link = "http://maps.google.com/maps/api/staticmap?&center="+city+"+"+street+"+"+postCode;
+    	if(mapType == 1 ){
+    		link+="&zoom=13&size=480x610&";
+    	}
+    	else{
+    		link+="&zoom=16&size=1200x610&";
+    	}
+    	link+="markers=size:mid|color:red&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg";
+    	return link;
+    }
+    
     
     public JPanel createGroupPanel() {
         groupPanel = new JPanel(new SpringLayout());
