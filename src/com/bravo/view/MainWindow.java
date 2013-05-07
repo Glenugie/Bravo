@@ -84,8 +84,10 @@ public final class MainWindow extends FrameView {
   	   
     	mapPanel = new JPanel();
     	mapPanel.setLayout(new BorderLayout());
-    						
 
+    	System.setProperty("http.proxyHost", "proxy.abdn.ac.uk");
+    	System.setProperty("http.proxyPort", "8080");
+    	
 		try {
 			URL link = new URL("http://maps.google.com/maps/api/staticmap?center=57.165736,-2.102185&zoom=4&markers=size:mid|color:black|high+street+aberdeen+uk&size=480x610&sensor=false&key=AIzaSyCzLXZkd3uPevpTSvmV9kQ5Trbts7UldJg");
 	    	ImageIcon img1 = new ImageIcon(link);   	
@@ -111,6 +113,10 @@ public final class MainWindow extends FrameView {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+    	System.setProperty("http.proxyHost", "");
+    	System.setProperty("http.proxyPort", "");
+    	
 		mm.setPreferredSize(new Dimension(1200,610));
     	JSplitPane maps = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mm , sm);	//contains 1 big map and 2 small ones
     	maps.setResizeWeight(0.8);   	
