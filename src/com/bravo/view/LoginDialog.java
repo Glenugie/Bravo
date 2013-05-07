@@ -56,6 +56,8 @@ public class LoginDialog extends javax.swing.JDialog {
         loginPanel.add(password);
         loginPanel.add(loginButton);
         
+        getRootPane().setDefaultButton(loginButton);
+        
         SpringUtilities.makeCompactGrid(loginPanel, 5, 1, 10, 10, 10, 10);
         this.add(loginPanel);
     }    

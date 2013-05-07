@@ -138,14 +138,10 @@ public class ProfileDialog extends javax.swing.JDialog{
 	    			}else if(Integer.parseInt(wdStart.substring(0,2))>Integer.parseInt(wdEnd.substring(0,2))){
 	    					Utils.error("The start of the working day should be earlier than the end");
 	    			}else{
-    					if (Utils.confirm("Confirm Update")){{ 
+    					if (Utils.confirm("Confirm Update")) {
     						//Mysql.query("UPDATE users (username, password, email)SET VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(newPassword.getPassword())+"', '"+email.getText()+"')WHERE username='" +username.getText()+"')");
-    						Mysql.query("UPDATE users SET password='"+Utils.passEncrypt(newPassword.getPassword())+"',email='"+email.getText()+"' WHERE username ='"+username.getText()+"'");
-    						
+    						Mysql.query("UPDATE users SET password='"+Utils.passEncrypt(newPassword.getPassword())+"',email='"+email.getText()+"',workday='"+workDay+"' WHERE username ='"+username.getText()+"'");
     						dispose();
-    					}
-    					
-    					
     					}
     				}
     			}
