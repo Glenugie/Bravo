@@ -1,7 +1,5 @@
 package com.bravo.view;
 
-import com.bravo.utils.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,6 +14,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+
+import com.bravo.utils.Mysql;
+import com.bravo.utils.SpringUtilities;
+import com.bravo.utils.Utils;
 
 public class RegisterDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 5427903396379849829L;
@@ -89,7 +91,7 @@ public class RegisterDialog extends javax.swing.JDialog {
 	    			} else if (!email.getText().equals(confirmEmail.getText())) {
 	    				Utils.error("Email addresses do not match");
 	    			} else {
-	    				Mysql.query("INSERT INTO users (username, password, email) VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(password.getPassword())+"', '"+email.getText()+"')");
+	    				Mysql.query("INSERT INTO users (username, password, email, workday) VALUES ('"+username.getText()+"', '"+Utils.passEncrypt(password.getPassword())+"', '"+email.getText()+"', '09:00-17:00')");
 		    			ArrayList<HashMap<String, Object>> userIdCheck = Mysql.query("SELECT userId FROM users WHERE username='"+username.getText()+"'");
 	    				mainWindow.setUser(((Integer) userIdCheck.get(0).get("userId")).longValue());
 	    				dispose();

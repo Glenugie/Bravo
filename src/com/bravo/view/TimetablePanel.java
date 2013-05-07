@@ -85,56 +85,49 @@ public class TimetablePanel extends javax.swing.JPanel {
 			c = new GridBagConstraints();
 			c.fill = GridBagConstraints.HORIZONTAL;
 
-			addCell("Date", 0, 0);
-			for (int i = 0; i < 1440; i += eventController.timeSlot) {
-				String time = Utils.minToTime(i);
-				
-				addCell(time, (i / eventController.timeSlot) + 1, 0);
-			}
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
-			String date = dateFormat.format(new Date().getTime());
-			for (int day = 0; day < 7; day += 1) {
-				ArrayList<HashMap<String, Object>> timetableDay = Mysql
-						.query("SELECT * FROM event WHERE userId='"
-								+ user.getId() + "' AND date='" + date
-								+ "' ORDER BY start ASC");
-
-				HashMap<Integer, Integer> events = new HashMap<Integer, Integer>();
-				addCell(date, 0, (day + 1));
-				for (int row = 0; row < timetableDay.size(); row += 1) {
-					
-					String startTime = (String) timetableDay.get(row).get("start");
-					String endTime = (String) timetableDay.get(row).get("end");
-					Integer startSlot = (((Integer.parseInt(startTime
-							.substring(0, 2)) * 60) + Integer
-							.parseInt(startTime.substring(3, 5)))/eventController.timeSlot) + 1; 
-					Integer endSlot = (((Integer.parseInt(endTime.substring(0,
-							2)) * 60) + Integer.parseInt(endTime
-							.substring(3, 5)))/eventController.timeSlot) + 1; 
-					events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot
-							- startSlot);
-				}
-
-				int row = 0;
-				
-				//add Image Icon to the button. ( team Logo small size)
+			int timetableView = mainWindow.getView();
+			if (timetableView == 1) {
+				addCell("Date", 0, 0);
 				for (int i = 0; i < 1440; i += eventController.timeSlot) {
-					if (events.get(i) != null) {
-						priority = (int) timetableDay.get(row).get("priority");
-						int eId = (int) timetableDay.get(row).get("eventId");
-						addCell((String) timetableDay.get(row).get("name"),
-								((i / eventController.timeSlot) + 1), (day + 1), events.get(i),
-								date, eId, priority);
-						row += 1;
-					} else {
-						
-						addCell("  ", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
-					}
+					String time = Utils.minToTime(i);
+					addCell(time, (i / eventController.timeSlot) + 1, 0);
 				}
-
-				date = dateFormat.format((new Date().getTime())
-						+ (86400000 * (day + 1)));
-				//System.out.println(date);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+				String date = dateFormat.format(new Date().getTime());
+				for (int day = 0; day < 7; day += 1) {
+					ArrayList<HashMap<String, Object>> timetableDay = Mysql.query("SELECT * FROM event WHERE userId='" + user.getId() + "' AND date='" + date + "' ORDER BY start ASC");
+					HashMap<Integer, Integer> events = new HashMap<Integer, Integer>();
+					addCell(date, 0, (day + 1));
+					for (int row = 0; row < timetableDay.size(); row += 1) {
+						String startTime = (String) timetableDay.get(row).get("start");
+						String endTime = (String) timetableDay.get(row).get("end");
+						Integer startSlot = (((Integer.parseInt(startTime.substring(0, 2)) * 60) + Integer.parseInt(startTime.substring(3, 5)))/eventController.timeSlot) + 1; 
+						Integer endSlot = (((Integer.parseInt(endTime.substring(0, 2)) * 60) + Integer.parseInt(endTime.substring(3, 5)))/eventController.timeSlot) + 1; 
+						events.put((startSlot * eventController.timeSlot) - (1 * eventController.timeSlot), endSlot - startSlot);
+					}
+					int row = 0;
+					
+					//add Image Icon to the button. ( team Logo small size)
+					for (int i = 0; i < 1440; i += eventController.timeSlot) {
+						if (events.get(i) != null) {
+							priority = (int) timetableDay.get(row).get("priority");
+							int eId = (int) timetableDay.get(row).get("eventId");
+							addCell((String) timetableDay.get(row).get("name"), ((i / eventController.timeSlot) + 1), (day + 1), events.get(i), date, eId, priority);
+							row += 1;
+						} else {
+							addCell("  ", ((i / eventController.timeSlot) + 1), (day + 1), 1, date, -1, 0);
+						}
+					}
+					date = dateFormat.format((new Date().getTime()) + (86400000 * (day + 1)));
+				}
+			} else {
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+				String date = dateFormat.format(new Date().getTime());
+				for (int day = 0; day < 31; day += 1) {
+					ArrayList<HashMap<String, Object>> timetableDay = Mysql.query("SELECT * FROM event WHERE userId='" + user.getId() + "' AND date='" + date + "' ORDER BY start ASC");
+					addMonthCell(date, (day % 7), (int) Math.floor(day/7), date, timetableDay.size());
+					date = dateFormat.format((new Date().getTime()) + (86400000 * (day + 1)));
+				}
 			}
 			JScrollPane scrollPane = new JScrollPane(timetable,
 					JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -144,7 +137,6 @@ public class TimetablePanel extends javax.swing.JPanel {
 			this.add(scrollPane, BorderLayout.CENTER);
 		}
 	}
-
 	ActionListener eventButtonAL = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
@@ -152,6 +144,19 @@ public class TimetablePanel extends javax.swing.JPanel {
 			String[] name = source.getName().split(",");
 			JFrame mainFrame = App.getApplication().getMainFrame();
 			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), name[0], name[1], Integer.parseInt(name[2]));
+			eventDialog.pack();
+			eventDialog.setLocationRelativeTo(null);
+			eventDialog.setSize(new Dimension(600, 400));
+			eventDialog.setVisible(true);
+		}
+	};
+	ActionListener eventMonthButtonAL = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			JButton source = (JButton) actionEvent.getSource();
+			String[] name = source.getName().split(",");
+			JFrame mainFrame = App.getApplication().getMainFrame();
+			EventDialog eventDialog = new EventDialog(mainWindow, eventController, mainFrame, true, user.getId(), "0", name[1], Integer.parseInt(name[2]));
 			eventDialog.pack();
 			eventDialog.setLocationRelativeTo(null);
 			eventDialog.setSize(new Dimension(600, 400));
@@ -204,16 +209,14 @@ public class TimetablePanel extends javax.swing.JPanel {
 		//System.out.println(priority);
 		
 		switch(priority) {
-		
-		case 1: b.setBackground(Color.WHITE); break;
-		case 2: b.setBackground(new Color(191, 169, 142)); break;
-		case 3: b.setBackground(new Color(50, 140, 115)); break;
-		case 4: b.setBackground(new Color(191, 145, 59)); break; 
-		case 5: b.setBackground(new Color(166, 59, 50));break;
-		default: b.setBackground(Color.WHITE);
-		//b.add(BtnLbl); bad idea to add image unless seriously modified
-		break; 
-		
+			case 1: b.setBackground(Color.WHITE); break;
+			case 2: b.setBackground(new Color(191, 169, 142)); break;
+			case 3: b.setBackground(new Color(50, 140, 115)); break;
+			case 4: b.setBackground(new Color(191, 145, 59)); break; 
+			case 5: b.setBackground(new Color(166, 59, 50));break;
+			default: b.setBackground(Color.WHITE);
+			//b.add(BtnLbl); bad idea to add image unless seriously modified
+			break; 
 		}
 		b.setOpaque(true);
 		//b.setVisible(true);
@@ -223,6 +226,31 @@ public class TimetablePanel extends javax.swing.JPanel {
 			e.printStackTrace();	
 		}
 	}
+	
+	public void addMonthCell(String s, int x, int y, String date, int eNum) {
+		c.gridx = x;
+		c.gridy = y;
+		c.ipadx = 50;
+		c.ipady = 50;
+		
+		JButton b = new JButton(s.split(" ")[0]+" "+s.split(" ")[1]+" ("+eNum+")");
+		b.setBorder(LineBorder.createBlackLineBorder());
+		b.setName(((x * eventController.timeSlot) - (1 * eventController.timeSlot)) + "," + date+",0");
+		b.addActionListener(eventMonthButtonAL);
+		b.setOpaque(true);
+		
+		ImageIcon ButtonIcon = new ImageIcon("TeamLogoBGForLogin.jpg");
+		JLabel BtnLbl = new JLabel();
+		BtnLbl.setIcon(ButtonIcon);
+		BtnLbl.setVisible(true);
+		
+		b.setOpaque(true);
+		b.setFont(new Font("Serif",Font.BOLD,18));
+		
+		timetable.add(b, c);
+		
+	}
+	
 	public void getImage (){  
 		ImageIcon icon = new ImageIcon ("BravoLogo.jpg");
 		bglogo =icon.getImage();

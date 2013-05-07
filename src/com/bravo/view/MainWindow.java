@@ -46,6 +46,7 @@ public final class MainWindow extends FrameView {
     private User user;
     private long userID;
     private MainWindow mw;
+    private int timetableView;
 	
     public MainWindow(SingleFrameApplication app) {
     	
@@ -62,6 +63,7 @@ public final class MainWindow extends FrameView {
         eventController = new EventController(this);
         mw = this;
         user = new User(-4);
+        timetableView = 1;
 
         initComponents();
         initMyComponents();
@@ -74,8 +76,7 @@ public final class MainWindow extends FrameView {
         update();
         mainPanel.add(tabbedPane);
        
-    }
-    
+    }    
     
     JPanel sm = new JPanel(); 
     JPanel mm = new JPanel(); 	
@@ -273,6 +274,9 @@ public final class MainWindow extends FrameView {
 		    	JMenuItem registerMenuItem = new JMenuItem("Register");
 		    		registerMenuItem.addActionListener(registerMenuItemAL);
 		    		accountMenu.add(registerMenuItem);
+		    	JMenuItem dummyMenuItem = new JMenuItem("Create 25 Dummy Accounts");
+		    		dummyMenuItem.addActionListener(dummyMenuItemAL);
+		    		accountMenu.add(dummyMenuItem);
     		} else {
     			JMenuItem ProfileMenuItem = new JMenuItem("Profile");
     			ProfileMenuItem.addActionListener(ProfileMenuItemAL);//need to add action listener
@@ -281,22 +285,19 @@ public final class MainWindow extends FrameView {
     			JMenuItem logoutMenuItem = new JMenuItem("Logout");
     			logoutMenuItem.setForeground(new Color(199,66,35));	
     			
-    			JRadioButton MonthView = new JRadioButton ("Month View");
-    			TimetableView.add(MonthView);
-    			JRadioButton WeekView = new JRadioButton ("Week View");
-    			TimetableView.add(WeekView);
-    			JRadioButton DayView = new JRadioButton("Day View");
-    			TimetableView.add(DayView);
+    			JMenuItem monthView = new JMenuItem ("Month View");
+    			monthView.addActionListener(mViewAL);
+    			if (timetableView == 2) { monthView.setEnabled(false);}
+    			TimetableView.add(monthView);
+    			JMenuItem weekView = new JMenuItem ("Week View");
+    			weekView.addActionListener(wViewAL);
+    			if (timetableView == 1) { weekView.setEnabled(false);}
+    			TimetableView.add(weekView);
     			
-    			
-    				
-    				
-    				//UIManager.put("logoutMenuItem.selectionBackground", new Color(199,66,35));
-    				logoutMenuItem.addActionListener(logoutMenuItemAL);
-	    			accountMenu.add(logoutMenuItem);
-	    		
+				//UIManager.put("logoutMenuItem.selectionBackground", new Color(199,66,35));
+				logoutMenuItem.addActionListener(logoutMenuItemAL);
+    			accountMenu.add(logoutMenuItem);		
     		}
-    		
     	menuBar.add(accountMenu);
     	menuBar.add(TimetableView);
     }
@@ -312,8 +313,30 @@ public final class MainWindow extends FrameView {
             clearOldEvents();
         }
     };
-    
-    
+    ActionListener dummyMenuItemAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+        	String lastDummy = (String) Mysql.query("SELECT username FROM users WHERE username LIKE 'DummyAccount%' ORDER BY userId DESC LIMIT 1").get(0).get("username");
+        	int dummyStart = Integer.parseInt(lastDummy.substring(12));
+        	for (int aC = 1; aC <= 25; aC += 1) {
+        		Mysql.query("INSERT INTO users (username, password, email, workday) VALUES ('DummyAccount"+(aC+dummyStart)+"', '"+Utils.passEncrypt("Test".toCharArray())+"', 'Test', '09:00-17:00')");
+        	}
+        }
+    };
+    ActionListener mViewAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+        	timetableView = 2;
+        	update();
+        }
+    };
+    ActionListener wViewAL = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+        	timetableView = 1;
+        	update();
+        }
+    };
     ActionListener ProfileMenuItemAL = new ActionListener(){
     	@Override
     	public void actionPerformed (ActionEvent actionEvent){
@@ -398,6 +421,10 @@ public final class MainWindow extends FrameView {
     
     public User getUser() {
     	return user;
+    }
+    
+    public int getView() {
+    	return timetableView;
     }
     
     /** This method is called from within the constructor to

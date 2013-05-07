@@ -306,7 +306,8 @@ public class EventController {
 							//Get user to confirm slot
 							Object[] options = {"Schedule Event", "Show Next Slot", "Cancel Scheduling"};
 							String slotLabel = "";
-							String workHourStart = "09:00"; String workHourEnd = "17:00";
+							String workDay = (String)Mysql.queryTerm("workDay","users","WHERE userId='"+user.getId()+"'");
+							String workHourStart = workDay.split("-")[0]; String workHourEnd = workDay.split("-")[1];
 							if (Utils.timeToMin(workHourStart) < Utils.timeToMin(chosenSlot.split(" ")[3]) || Utils.timeToMin(workHourEnd) > Utils.timeToMin(chosenSlot.split(" ")[3])) {
 								slotLabel += "Out of Hours ";
 							}
