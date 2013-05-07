@@ -313,8 +313,10 @@ public final class MainWindow extends FrameView {
     ActionListener dummyMenuItemAL = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
+        	String lastDummy = (String) Mysql.query("SELECT username FROM users WHERE username LIKE 'DummyAccount%' ORDER BY userId DESC LIMIT 1").get(0).get("username");
+        	int dummyStart = Integer.parseInt(lastDummy.substring(12));
         	for (int aC = 1; aC <= 25; aC += 1) {
-        		Mysql.query("INSERT INTO users (username, password, email, workday) VALUES ('DummyAccount"+aC+"', '"+Utils.passEncrypt("Test".toCharArray())+"', 'Test', '09:00-17:00')");
+        		Mysql.query("INSERT INTO users (username, password, email, workday) VALUES ('DummyAccount"+(aC+dummyStart)+"', '"+Utils.passEncrypt("Test".toCharArray())+"', 'Test', '09:00-17:00')");
         	}
         }
     };
