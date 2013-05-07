@@ -35,7 +35,6 @@ public class Event {
 			location = new Long((long) result.get("GENERATED_KEY")).intValue();
 		} catch (Exception ex) {
 			location = -1;
-			ex.printStackTrace();
 		}
 		priority = p;
 	}
