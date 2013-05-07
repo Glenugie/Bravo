@@ -3,6 +3,7 @@ package com.bravo.view;
 import com.bravo.model.User;
 import com.bravo.utils.*;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,15 +62,20 @@ public class GroupCreateDialog extends javax.swing.JDialog {
     }
 
     private void initMyComponents() {
-    	this.setTitle(("Group Create"));
+    	this.setTitle(("Create Group"));
     	JPanel groupPanel = new JPanel(new SpringLayout());
     	groupName = new JTextField();
+    	groupName.setMaximumSize( groupName.getPreferredSize());
+    	
     	groupPanel.add(groupName);
+    	groupPanel.setBackground(Color.WHITE);
     	JButton groupCreate = new JButton("Create Group");
     	groupCreate.addActionListener(groupButtonAL);
     	groupPanel.add(groupCreate);
+    	
     	SpringUtilities.makeCompactGrid(groupPanel, 2, 1, 10, 10, 10, 10);
     	this.add(groupPanel);
+    	
     }    
     ActionListener groupButtonAL = new ActionListener() {
         @Override

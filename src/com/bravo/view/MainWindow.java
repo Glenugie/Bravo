@@ -206,12 +206,15 @@ public final class MainWindow extends FrameView {
     
     public JPanel createGroupPanel() {
         groupPanel = new JPanel(new SpringLayout());
-        groupPanel.add(new JLabel("Groups are an abstract concept that don't truly exist in this universe"));
+        groupPanel.add(new JLabel("<html><font size=20><b><u>Groups</u></b></font></html>"));
+        
         JButton groupCreate = new JButton("Create Group");
         groupCreate.addActionListener(groupCreateAL);
         groupPanel.add(groupCreate);
         
         JPanel groupList = new JPanel(new SpringLayout());
+        groupList.add(new JLabel("<html><font size=12><b><u>You are a member of the following groups:</u></b></font></html>"));
+        groupList.add(new JLabel(""));
         int i = 0;
         for (HashMap<String, Object> group : Mysql.query("SELECT * FROM groups")) {
         	groupList.add(new JLabel((String)group.get("groupname")));
