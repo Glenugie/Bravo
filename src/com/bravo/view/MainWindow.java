@@ -216,9 +216,10 @@ public final class MainWindow extends FrameView {
         JPanel groupList = new JPanel(new SpringLayout());
         groupList.add(new JLabel("<html><font size=12><b><u>You are a member of the following groups:</u></b></font></html>"));
         groupList.add(new JLabel(""));
+        
         int i = 0;
         for (HashMap<String, Object> group : Mysql.query("SELECT * FROM groups")) {
-        	groupList.add(new JLabel((String)group.get("groupname")));
+        	
         	JButton addMembers = new JButton("Add Members");
         	addMembers.setName((String)group.get("groupname"));
         	addMembers.addActionListener(addMembersAL);
@@ -228,8 +229,9 @@ public final class MainWindow extends FrameView {
         		groupList.add(new JLabel(""));
         	}
         	i += 1;
+        	groupList.add(new JLabel((String)group.get("groupname")));
         }
-        SpringUtilities.makeCompactGrid(groupList, i, 2, 10, 10, 10, 10);
+        SpringUtilities.makeCompactGrid(groupList, i+1, 2, 10, 10, 10, 10);
         groupPanel.add(groupList);
 
         SpringUtilities.makeCompactGrid(groupPanel, 3, 1, 10, 10, 10, 10);
