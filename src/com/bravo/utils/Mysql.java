@@ -1,6 +1,10 @@
 package com.bravo.utils;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,7 +12,7 @@ public class Mysql {
 	private static String proxyServer = "jdbc:mysql://127.0.0.1:3306/shiftout_cs3024b?user=shiftout_cs3024b&password=cs3024bpassword"; //Bypasses proxy when .bashrc is modified
 	private static String nonproxyServer = "jdbc:mysql://shiftout.co.uk:3306/shiftout_cs3024b?user=shiftout_cs3024b&password=cs3024bpassword"; //Gets used when no proxy is set
 	private static String localServer = "jdbc:mysql://127.0.0.1:3306/timetable?user=root&cs3024";
-	private static boolean local = true;
+	private static boolean local = false;
 	private static String server;
 	
 	public static boolean testConnection() {
@@ -32,6 +36,25 @@ public class Mysql {
 		}
     	System.out.println("Mysql Connection Success");
 		return true;
+	}
+	
+	public static boolean checkProxy() {
+		String test = nonproxyServer;
+		boolean proxy = false;
+		try {
+			Class.forName("org.gjt.mm.mysql.Driver");
+			DriverManager.getConnection(test);
+		} catch (Exception e1) {
+    		test = proxyServer;
+    		try {
+    			Class.forName("org.gjt.mm.mysql.Driver");
+    			DriverManager.getConnection(test);
+    			proxy = true;
+    		} catch (Exception e2) {
+    			//No Database connection
+    		}
+		}
+		return proxy;
 	}
 	
 	public static ArrayList<HashMap<String, Object>> query(String query) {
